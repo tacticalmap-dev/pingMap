@@ -59,7 +59,11 @@ public class PingRenderer {
         RenderSystem.disableCull();
 
         for (PingManager.Ping ping : pings) {
-            renderPing(poseStack, bufferBuilder, ping, player.tickCount);
+            if (ping.expired()) {
+                manager.cancelPing(ping);
+            } else {
+                renderPing(poseStack, bufferBuilder, ping, player.tickCount);
+            }
         }
 
         RenderSystem.enableCull();

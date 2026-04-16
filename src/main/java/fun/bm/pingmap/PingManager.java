@@ -6,8 +6,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.storage.LevelResource;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -37,16 +39,11 @@ public class PingManager {
     }
 
     private void load(Minecraft minecraft) {
-        File saveDir = minecraft.getSingleplayerServer() != null
-                ? minecraft.getSingleplayerServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile()
-                : null;
-
-        if (saveDir == null && minecraft.level != null) {
-            String levelId = minecraft.getSingleplayerServer() != null
-                    ? minecraft.getSingleplayerServer().getWorldData().getLevelName()
-                    : "default";
-            saveDir = minecraft.gameDirectory.toPath().resolve("saves").resolve(levelId).toFile();
+        if (minecraft.getSingleplayerServer() == null) {
+            return;
         }
+
+        File saveDir = minecraft.getSingleplayerServer().getWorldPath(LevelResource.ROOT).toFile();
 
         if (saveDir == null || !saveDir.exists()) {
             return;
@@ -55,7 +52,7 @@ public class PingManager {
         File dataFile = new File(saveDir, DATA_FILE);
         if (dataFile.exists()) {
             try {
-                CompoundTag tag = net.minecraft.nbt.NbtIo.read(dataFile);
+                CompoundTag tag = NbtIo.read(dataFile);
                 if (tag != null) {
                     ListTag listTag = tag.getList("pings", Tag.TAG_COMPOUND);
                     for (int i = 0; i < listTag.size(); i++) {
@@ -71,16 +68,11 @@ public class PingManager {
     }
 
     private void save(Minecraft minecraft) {
-        File saveDir = null;
-
-        if (minecraft.getSingleplayerServer() != null) {
-            saveDir = minecraft.getSingleplayerServer().getWorldPath(net.minecraft.world.level.storage.LevelResource.ROOT).toFile();
-        } else if (minecraft.level != null) {
-            String levelId = minecraft.hasSingleplayerServer()
-                    ? minecraft.getSingleplayerServer().getWorldData().getLevelName()
-                    : "default";
-            saveDir = minecraft.gameDirectory.toPath().resolve("saves").resolve(levelId).toFile();
+        if (minecraft.getSingleplayerServer() == null) {
+            return;
         }
+
+        File saveDir = minecraft.getSingleplayerServer().getWorldPath(LevelResource.ROOT).toFile();
 
         if (saveDir == null || !saveDir.exists()) {
             return;
@@ -94,7 +86,7 @@ public class PingManager {
                 listTag.add(ping.toNBT());
             }
             tag.put("pings", listTag);
-            net.minecraft.nbt.NbtIo.write(tag, dataFile);
+            NbtIo.write(tag, dataFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,7 +113,7 @@ public class PingManager {
             }
         }
         long timestamp = System.currentTimeMillis();
-        pings.put(timestamp, new PointPing(x, y, z, generatorId, dimension, timestamp));
+        pings.put(timestamp, new PointPing(x, y, z, generatorId, dimension, timestamp, 30));
         save(minecraft);
     }
 
@@ -145,7 +137,7 @@ public class PingManager {
             }
         }
         long timestamp = System.currentTimeMillis();
-        pings.put(timestamp, new EntityPing(entity.getUUID(), timestamp, dimension, generatorId));
+        pings.put(timestamp, new EntityPing(entity.getUUID(), timestamp, dimension, generatorId, 10));
         save(minecraft);
     }
 
@@ -224,6 +216,8 @@ public class PingManager {
     }
 
     public interface Ping {
+        boolean expired();
+
         CompoundTag toNBT();
 
         Ping fromNBT(CompoundTag tag);
@@ -250,14 +244,16 @@ public class PingManager {
         private final long timestamp;
         private final UUID generatorId;
         private final String dimension;
+        private final int expireAfter;
 
-        public PointPing(double x, double y, double z, UUID generatorId, String dimension, long timestamp) {
+        public PointPing(double x, double y, double z, UUID generatorId, String dimension, long timestamp, int expireAfter) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.generatorId = generatorId;
             this.dimension = dimension;
             this.timestamp = timestamp;
+            this.expireAfter = expireAfter;
         }
 
         public PointPing() {
@@ -267,6 +263,11 @@ public class PingManager {
             this.timestamp = 0;
             this.generatorId = null;
             this.dimension = null;
+            this.expireAfter = 0;
+        }
+
+        public boolean expired() {
+            return expireAfter == -1 || System.currentTimeMillis() - timestamp > expireAfter * 1000L;
         }
 
         public CompoundTag toNBT() {
@@ -277,6 +278,7 @@ public class PingManager {
             tag.putUUID("generatorId", generatorId);
             tag.putString("dimension", dimension);
             tag.putLong("timestamp", timestamp);
+            tag.putInt("expireAfter", expireAfter);
             tag.putByte("type", (byte) PingType.Point.ordinal());
             return tag;
         }
@@ -288,7 +290,8 @@ public class PingManager {
                     tag.getDouble("z"),
                     tag.getUUID("generatorId"),
                     tag.getString("dimension"),
-                    tag.getLong("timestamp")
+                    tag.getLong("timestamp"),
+                    tag.getInt("expireAfter")
             );
         }
 
@@ -327,16 +330,18 @@ public class PingManager {
         private final long timestamp;
         private final String dimension;
         private final UUID generatorId;
+        private final int expireAfter;
         private Entity cachedEntity;
         private long lastCheckTime;
 
-        public EntityPing(UUID entityId, long timestamp, String dimension, UUID generatorId) {
+        public EntityPing(UUID entityId, long timestamp, String dimension, UUID generatorId, int expireAfter) {
             this.entityId = entityId;
             this.timestamp = timestamp;
             this.dimension = dimension;
             this.generatorId = generatorId;
             this.cachedEntity = null;
             this.lastCheckTime = 0;
+            this.expireAfter = expireAfter;
         }
 
         public EntityPing() {
@@ -346,6 +351,11 @@ public class PingManager {
             this.generatorId = null;
             this.cachedEntity = null;
             this.lastCheckTime = 0;
+            this.expireAfter = 0;
+        }
+
+        public boolean expired() {
+            return expireAfter == -1 || System.currentTimeMillis() - timestamp > expireAfter * 1000L;
         }
 
         public CompoundTag toNBT() {
@@ -354,6 +364,7 @@ public class PingManager {
             tag.putLong("timestamp", timestamp);
             tag.putString("dimension", dimension);
             tag.putUUID("generatorId", generatorId);
+            tag.putInt("expireAfter", expireAfter);
             tag.putByte("type", (byte) PingType.Enemy.ordinal());
             return tag;
         }
@@ -363,7 +374,8 @@ public class PingManager {
                     tag.getUUID("entityId"),
                     tag.getLong("timestamp"),
                     tag.getString("dimension"),
-                    tag.getUUID("generatorId")
+                    tag.getUUID("generatorId"),
+                    tag.getInt("expireAfter")
             );
         }
 
