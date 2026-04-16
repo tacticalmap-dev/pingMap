@@ -105,7 +105,7 @@ class PingKeyEventHandler {
                 String dimension = minecraft.level.dimension().location().toString();
                 PingManager manager = PingManager.get(minecraft);
                 if (manager != null) {
-                    manager.addEntityPing(target, dimension, minecraft.player.getUUID());
+                    manager.addEntityPing(target, dimension, minecraft.player.getUUID(), PingManager.PingType.Enemy);
                     minecraft.player.sendSystemMessage(
                             Component.literal(String.format("§a已标记实体: %s", target.getName().getString()))
                     );

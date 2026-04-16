@@ -125,9 +125,8 @@ public class PingManager {
         save(minecraft);
     }
 
-    public void addEntityPing(Entity entity, String dimension, UUID generatorId) {
+    public void addEntityPing(Entity entity, String dimension, UUID generatorId, PingType type) {
         Minecraft minecraft = Minecraft.getInstance();
-        PingType type = PingType.Entity;
         if (type.getMaxPings() > 0) {
             int count = 0;
             for (Ping ping : pings.asMap().values()) {
@@ -172,7 +171,8 @@ public class PingManager {
 
     public enum PingType {
         Point(PointPing.class, "●", 0xFFFFFF00, Font.DisplayMode.SEE_THROUGH, 1),
-        Entity(EntityPing.class, "●", 0xFFFF0000, Font.DisplayMode.SEE_THROUGH, -1);
+        Enemy(EntityPing.class, "●", 0xFFFF0000, Font.DisplayMode.SEE_THROUGH, -1),
+        Friendly(EntityPing.class, "●", 0x8000FFFF, Font.DisplayMode.NORMAL, -1);
 
         private final Class<? extends Ping> origin;
         private final String icon;
@@ -354,7 +354,7 @@ public class PingManager {
             tag.putLong("timestamp", timestamp);
             tag.putString("dimension", dimension);
             tag.putUUID("generatorId", generatorId);
-            tag.putByte("type", (byte) PingType.Entity.ordinal());
+            tag.putByte("type", (byte) PingType.Enemy.ordinal());
             return tag;
         }
 
@@ -420,7 +420,7 @@ public class PingManager {
 
         @Override
         public PingType getType() {
-            return PingType.Entity;
+            return PingType.Enemy;
         }
     }
 }
