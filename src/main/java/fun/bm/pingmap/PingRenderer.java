@@ -40,15 +40,13 @@ public class PingRenderer {
         }
 
         PoseStack poseStack = event.getPoseStack();
+        poseStack.pushPose();
 
         Player player = minecraft.player;
         double cameraX = event.getCamera().getPosition().x();
         double cameraY = event.getCamera().getPosition().y();
         double cameraZ = event.getCamera().getPosition().z();
 
-        renderPingLabels(poseStack, minecraft, pings, cameraX, cameraY, cameraZ);
-
-        poseStack.pushPose();
         poseStack.translate(-cameraX, -cameraY, -cameraZ);
 
         Tesselator tesselator = Tesselator.getInstance();
@@ -71,6 +69,8 @@ public class PingRenderer {
         RenderSystem.disableBlend();
 
         poseStack.popPose();
+
+        renderPingLabels(event.getPoseStack(), minecraft, pings, cameraX, cameraY, cameraZ);
     }
 
     private static void renderPing(PoseStack poseStack, BufferBuilder bufferBuilder,
@@ -129,11 +129,11 @@ public class PingRenderer {
 
         Player player = minecraft.player;
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
         RenderSystem.disableCull();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
 
         for (PingManager.Ping ping : pings) {
             double dx = ping.x - player.getX();
@@ -195,9 +195,9 @@ public class PingRenderer {
             eventPoseStack.popPose();
         }
 
+        RenderSystem.disableBlend();
         RenderSystem.enableCull();
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
-        RenderSystem.disableBlend();
     }
 }
