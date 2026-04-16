@@ -58,9 +58,8 @@ public class PingRenderer {
         RenderSystem.depthMask(false);
         RenderSystem.disableCull();
 
-        for (int i = 0; i < pings.size(); i++) {
-            PingManager.Ping ping = pings.get(i);
-            renderPing(poseStack, bufferBuilder, ping, i, player.tickCount);
+        for (PingManager.Ping ping : pings) {
+            renderPing(poseStack, bufferBuilder, ping, player.tickCount);
         }
 
         RenderSystem.enableCull();
@@ -74,7 +73,7 @@ public class PingRenderer {
     }
 
     private static void renderPing(PoseStack poseStack, BufferBuilder bufferBuilder,
-                                   PingManager.Ping ping, int index, float tickCount) {
+                                   PingManager.Ping ping, float tickCount) {
         float pulse = (float) Math.sin(tickCount * 0.1F) * 0.2F + 0.8F;
 
         Matrix4f matrix = poseStack.last().pose();
@@ -170,7 +169,7 @@ public class PingRenderer {
                     false,
                     eventPoseStack.last().pose(),
                     minecraft.renderBuffers().bufferSource(),
-                    net.minecraft.client.gui.Font.DisplayMode.NORMAL,
+                    net.minecraft.client.gui.Font.DisplayMode.SEE_THROUGH,
                     0,
                     15728880
             );
@@ -186,7 +185,7 @@ public class PingRenderer {
                     false,
                     eventPoseStack.last().pose(),
                     minecraft.renderBuffers().bufferSource(),
-                    net.minecraft.client.gui.Font.DisplayMode.NORMAL,
+                    net.minecraft.client.gui.Font.DisplayMode.SEE_THROUGH,
                     0,
                     15728880
             );

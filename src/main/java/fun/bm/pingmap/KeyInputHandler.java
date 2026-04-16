@@ -46,24 +46,23 @@ class PingKeyEventHandler {
 
         net.minecraft.world.phys.HitResult hitResult = minecraft.player.pick(500.0D, 0.0F, false);
 
-        if (hitResult.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) {
+        if (hitResult.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) {
+            net.minecraft.world.phys.BlockHitResult blockHit = (net.minecraft.world.phys.BlockHitResult) hitResult;
+            net.minecraft.world.phys.Vec3 hitVec = blockHit.getLocation();
+            String dimension = minecraft.level.dimension().location().toString();
+
+            PingManager manager = PingManager.get(minecraft);
+            if (manager != null) {
+                manager.addPing(hitVec.x, hitVec.y, hitVec.z, dimension);
+
+                minecraft.player.sendSystemMessage(
+                        Component.literal(String.format("§a已添加标记点: X=%.2f Y=%.2f Z=%.2f",
+                                hitVec.x, hitVec.y, hitVec.z))
+                );
+            }
+        } else {
             minecraft.player.sendSystemMessage(
                     Component.literal("§c请看向一个方块！")
-            );
-            return;
-        }
-
-        net.minecraft.world.phys.BlockHitResult blockHit = (net.minecraft.world.phys.BlockHitResult) hitResult;
-        net.minecraft.world.phys.Vec3 hitVec = blockHit.getLocation();
-        String dimension = minecraft.level.dimension().location().toString();
-
-        PingManager manager = PingManager.get(minecraft);
-        if (manager != null) {
-            manager.addPing(hitVec.x, hitVec.y, hitVec.z, dimension);
-
-            minecraft.player.sendSystemMessage(
-                    Component.literal(String.format("§a已添加标记点: X=%.2f Y=%.2f Z=%.2f",
-                            hitVec.x, hitVec.y, hitVec.z))
             );
         }
     }
