@@ -83,8 +83,6 @@ class PingKeyEventHandler {
 
         double maxDistance = 500.0D;
 
-        HitResult blockHit = minecraft.player.pick(maxDistance, 0.0F, false);
-
         Vec3 eyePosition = minecraft.player.getEyePosition(1.0F);
         Vec3 lookAngle = minecraft.player.getViewVector(1.0F);
         Vec3 endPosition = eyePosition.add(lookAngle.scale(maxDistance));
@@ -111,23 +109,27 @@ class PingKeyEventHandler {
                     );
                 }
             }
-        } else if (blockHit != null && blockHit.getType() == HitResult.Type.BLOCK) {
-            Vec3 hitVec = blockHit.getLocation();
-            String dimension = minecraft.level.dimension().location().toString();
+        } else {
+            HitResult blockHit = minecraft.player.pick(maxDistance, 0.0F, false);
 
-            PingManager manager = PingManager.get(minecraft);
-            if (manager != null) {
-                manager.addPointPing(hitVec.x, hitVec.y, hitVec.z, dimension, minecraft.player.getUUID());
+            if (blockHit != null && blockHit.getType() == HitResult.Type.BLOCK) {
+                Vec3 hitVec = blockHit.getLocation();
+                String dimension = minecraft.level.dimension().location().toString();
 
+                PingManager manager = PingManager.get(minecraft);
+                if (manager != null) {
+                    manager.addPointPing(hitVec.x, hitVec.y, hitVec.z, dimension, minecraft.player.getUUID());
+
+                    minecraft.player.sendSystemMessage(
+                            Component.literal(String.format("§a已添加标记点: X=%.2f Y=%.2f Z=%.2f",
+                                    hitVec.x, hitVec.y, hitVec.z))
+                    );
+                }
+            } else {
                 minecraft.player.sendSystemMessage(
-                        Component.literal(String.format("§a已添加标记点: X=%.2f Y=%.2f Z=%.2f",
-                                hitVec.x, hitVec.y, hitVec.z))
+                        Component.literal("§c无效目标！")
                 );
             }
-        } else {
-            minecraft.player.sendSystemMessage(
-                    Component.literal("§c无效目标！")
-            );
         }
     }
 }
