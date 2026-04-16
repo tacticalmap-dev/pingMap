@@ -102,9 +102,22 @@ public class PingManager {
 
     public void addPointPing(double x, double y, double z, String dimension, UUID generatorId) {
         Minecraft minecraft = Minecraft.getInstance();
-        for (Ping ping : pings.asMap().values()) {
-            if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId)) {
-                pings.invalidate(ping.getTimestamp());
+        PingType type = PingType.Point;
+        if (type.getMaxPings() > 0) {
+            int count = 0;
+            for (Ping ping : pings.asMap().values()) {
+                if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId) && ping.getType() == type) {
+                    count++;
+                }
+            }
+            while (count >= type.getMaxPings()) {
+                for (Ping ping : pings.asMap().values()) {
+                    if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId) && ping.getType() == type) {
+                        pings.invalidate(ping.getTimestamp());
+                        count--;
+                        break;
+                    }
+                }
             }
         }
         long timestamp = System.currentTimeMillis();
@@ -114,9 +127,22 @@ public class PingManager {
 
     public void addEntityPing(Entity entity, String dimension, UUID generatorId) {
         Minecraft minecraft = Minecraft.getInstance();
-        for (Ping ping : pings.asMap().values()) {
-            if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId)) {
-                pings.invalidate(ping.getTimestamp());
+        PingType type = PingType.Entity;
+        if (type.getMaxPings() > 0) {
+            int count = 0;
+            for (Ping ping : pings.asMap().values()) {
+                if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId) && ping.getType() == type) {
+                    count++;
+                }
+            }
+            while (count >= type.getMaxPings()) {
+                for (Ping ping : pings.asMap().values()) {
+                    if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId) && ping.getType() == type) {
+                        pings.invalidate(ping.getTimestamp());
+                        count--;
+                        break;
+                    }
+                }
             }
         }
         long timestamp = System.currentTimeMillis();
@@ -145,19 +171,21 @@ public class PingManager {
     }
 
     public enum PingType {
-        Point(PointPing.class, "●", 0xFFFFFF00, Font.DisplayMode.SEE_THROUGH),
-        Entity(EntityPing.class, "●", 0xFFFF0000, Font.DisplayMode.SEE_THROUGH);
+        Point(PointPing.class, "●", 0xFFFFFF00, Font.DisplayMode.SEE_THROUGH, 1),
+        Entity(EntityPing.class, "●", 0xFFFF0000, Font.DisplayMode.SEE_THROUGH, -1);
 
         private final Class<? extends Ping> origin;
         private final String icon;
         private final int color;
         private final Font.DisplayMode displayMode;
+        private final int maxPings;
 
-        PingType(Class<? extends Ping> clazz, String icon, int color, Font.DisplayMode displayMode) {
+        PingType(Class<? extends Ping> clazz, String icon, int color, Font.DisplayMode displayMode, int maxPings) {
             this.origin = clazz;
             this.icon = icon;
             this.color = color;
             this.displayMode = displayMode;
+            this.maxPings = maxPings;
         }
 
         public static PingType fromOrdinal(int ordinal) {
@@ -188,6 +216,10 @@ public class PingManager {
 
         public Font.DisplayMode getDisplayMode() {
             return displayMode;
+        }
+
+        public int getMaxPings() {
+            return maxPings == -1 ? Integer.MAX_VALUE : maxPings;
         }
     }
 
