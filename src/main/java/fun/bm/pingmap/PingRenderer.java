@@ -80,9 +80,9 @@ public class PingRenderer {
 
         bufferBuilder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
 
-        double x = ping.x;
-        double y = ping.y + 0.01;
-        double z = ping.z;
+        double x = ping.getX();
+        double y = ping.getY() + 0.01;
+        double z = ping.getZ();
 
         float red = 1.0F;
         float green = pulse;
@@ -135,9 +135,9 @@ public class PingRenderer {
         RenderSystem.defaultBlendFunc();
 
         for (PingManager.Ping ping : pings) {
-            double dx = ping.x - player.getX();
-            double dy = ping.y - player.getY();
-            double dz = ping.z - player.getZ();
+            double dx = ping.getX() - player.getX();
+            double dy = ping.getY() - player.getY();
+            double dz = ping.getZ() - player.getZ();
             double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
             if (distance > 1000) {
@@ -146,12 +146,12 @@ public class PingRenderer {
 
             eventPoseStack.pushPose();
 
-            eventPoseStack.translate(ping.x - cameraX, ping.y + 0.5 - cameraY, ping.z - cameraZ);
+            eventPoseStack.translate(ping.getX() - cameraX, ping.getY() + 0.5 - cameraY, ping.getZ() - cameraZ);
             eventPoseStack.mulPose(minecraft.getEntityRenderDispatcher().cameraOrientation());
 
             float baseScale = 0.025F;
             float distanceScale = (float) Math.max(distance / 10.0, 1.0);
-            float scale = baseScale * distanceScale;
+            float scale = baseScale * distanceScale * 1.5F; // 调整缩放比例
 
             eventPoseStack.scale(-scale, -scale, scale);
 
@@ -162,14 +162,14 @@ public class PingRenderer {
             eventPoseStack.translate(0, -10, 0);
 
             minecraft.font.drawInBatch(
-                    Component.literal("●"),
-                    -minecraft.font.width("●") / 2.0F,
+                    Component.literal(ping.getType().getIcon()),
+                    -minecraft.font.width(ping.getType().getIcon()) / 2.0F,
                     0,
-                    0xFFFFFF00,
+                    ping.getType().getColor(),
                     false,
                     eventPoseStack.last().pose(),
                     minecraft.renderBuffers().bufferSource(),
-                    net.minecraft.client.gui.Font.DisplayMode.SEE_THROUGH,
+                    ping.getType().getDisplayMode(),
                     0,
                     15728880
             );
@@ -185,7 +185,7 @@ public class PingRenderer {
                     false,
                     eventPoseStack.last().pose(),
                     minecraft.renderBuffers().bufferSource(),
-                    net.minecraft.client.gui.Font.DisplayMode.SEE_THROUGH,
+                    ping.getType().getDisplayMode(),
                     0,
                     15728880
             );
