@@ -417,17 +417,17 @@ public class PingManager {
 
         public double getX() {
             Entity entity = getEntity();
-            return entity != null ? entity.getX() : 0;
+            return entity != null ? entity.getX() : Double.MAX_VALUE;
         }
 
         public double getY() {
             Entity entity = getEntity();
-            return entity != null ? entity.getY() : 0;
+            return entity != null ? entity.getY() : Double.MAX_VALUE;
         }
 
         public double getZ() {
             Entity entity = getEntity();
-            return entity != null ? entity.getZ() : 0;
+            return entity != null ? entity.getZ() : Double.MAX_VALUE;
         }
 
         public long getTimestamp() {
