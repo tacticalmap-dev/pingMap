@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class PingManager {
     private static final String DATA_FILE = "pingmap_data.dat";
     private static PingManager instance;
+    private long lastTimestamp = 0;
     private final Cache<Long, Ping> pings = CacheBuilder.newBuilder()
             .expireAfterWrite(30, TimeUnit.SECONDS).build();
 
@@ -82,7 +83,7 @@ public class PingManager {
             File dataFile = new File(saveDir, DATA_FILE);
             CompoundTag tag = new CompoundTag();
             ListTag listTag = new ListTag();
-            for (Ping ping : pings.asMap().values()) {
+            for (Ping ping : getPings()) {
                 listTag.add(ping.toNBT());
             }
             tag.put("pings", listTag);
@@ -92,42 +93,46 @@ public class PingManager {
         }
     }
 
-    public void addPointPing(double x, double y, double z, String dimension, UUID generatorId) {
+    public PointPing addPointPing(double x, double y, double z, String dimension, UUID generatorId) {
         Minecraft minecraft = Minecraft.getInstance();
         PingType type = PingType.Point;
-        if (type.getMaxPings() > 0) {
-            int count = 0;
-            for (Ping ping : pings.asMap().values()) {
-                if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId) && ping.getType() == type) {
-                    count++;
-                }
-            }
-            while (count >= type.getMaxPings()) {
-                for (Ping ping : pings.asMap().values()) {
-                    if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId) && ping.getType() == type) {
-                        pings.invalidate(ping.getTimestamp());
-                        count--;
-                        break;
-                    }
-                }
-            }
-        }
-        long timestamp = System.currentTimeMillis();
-        pings.put(timestamp, new PointPing(x, y, z, generatorId, dimension, timestamp, 30));
+        cleanUpPings(dimension, generatorId, type);
+        long timestamp = generateUniqueTimestamp();
+        PointPing ping = new PointPing(x, y, z, generatorId, dimension, timestamp, 30);
+        pings.put(timestamp, ping);
         save(minecraft);
+        return ping;
     }
 
-    public void addEntityPing(Entity entity, String dimension, UUID generatorId, PingType type) {
+    public EntityPing addEntityPing(Entity entity, String dimension, UUID generatorId, PingType type) {
         Minecraft minecraft = Minecraft.getInstance();
+        cleanUpPings(dimension, generatorId, type);
+        long timestamp = generateUniqueTimestamp();
+        EntityPing ping = new EntityPing(entity.getUUID(), timestamp, dimension, generatorId, 10);
+        pings.put(timestamp, ping);
+        save(minecraft);
+        return ping;
+    }
+
+    public ServerPing addServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance) {
+        Minecraft minecraft = Minecraft.getInstance();
+        ServerPing ping = new ServerPing(name, dimension, x, y, z, color, showDistance);
+        long timestamp = generateUniqueTimestamp();
+        pings.put(timestamp, ping);
+        save(minecraft);
+        return ping;
+    }
+
+    private void cleanUpPings(String dimension, UUID generatorId, PingType type) {
         if (type.getMaxPings() > 0) {
             int count = 0;
-            for (Ping ping : pings.asMap().values()) {
+            for (Ping ping : getPings()) {
                 if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId) && ping.getType() == type) {
                     count++;
                 }
             }
             while (count >= type.getMaxPings()) {
-                for (Ping ping : pings.asMap().values()) {
+                for (Ping ping : getPings()) {
                     if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId) && ping.getType() == type) {
                         pings.invalidate(ping.getTimestamp());
                         count--;
@@ -136,9 +141,15 @@ public class PingManager {
                 }
             }
         }
-        long timestamp = System.currentTimeMillis();
-        pings.put(timestamp, new EntityPing(entity.getUUID(), timestamp, dimension, generatorId, 10));
-        save(minecraft);
+    }
+
+    private synchronized long generateUniqueTimestamp() {
+        long current = System.currentTimeMillis();
+        if (current <= lastTimestamp) {
+            current = lastTimestamp + 1;
+        }
+        lastTimestamp = current;
+        return current;
     }
 
     public void cancelPing(Ping ping) {
@@ -153,7 +164,7 @@ public class PingManager {
 
     public List<Ping> getPingsForDimension(String dimension) {
         List<Ping> result = new ArrayList<>();
-        for (Ping ping : pings.asMap().values()) {
+        for (Ping ping : getPings()) {
             if (ping.getDimension().equals(dimension)) {
                 result.add(ping);
             }
