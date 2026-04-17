@@ -2,13 +2,18 @@ package fun.bm.pingmap.pingmanager;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import fun.bm.pingmap.api.pingmanager.PingManager;
+import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.enums.PingType;
-import fun.bm.pingmap.pingmanager.pings.Ping;
+import fun.bm.pingmap.pingmanager.ping.EntityPing;
+import fun.bm.pingmap.pingmanager.ping.PointPing;
+import fun.bm.pingmap.pingmanager.ping.ServerPing;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.File;
@@ -19,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class ServerPingManager {
+public class ServerPingManager implements PingManager {
     private static final String DATA_FILE = "pingmap_data.dat";
     protected static ServerPingManager instance;
     protected long lastTimestamp = 0;
@@ -79,7 +84,7 @@ public class ServerPingManager {
         }
     }
 
-    protected void save(MinecraftServer server) {
+    public void save(MinecraftServer server) {
         if (server == null) {
             return;
         }
@@ -166,5 +171,32 @@ public class ServerPingManager {
             }
         }
         return result;
+    }
+
+    public PointPing addPointPing(double x, double y, double z, String dimension, UUID generatorId, MinecraftServer server) {
+        PingType type = PingType.Point;
+        cleanUpPings(dimension, generatorId, type);
+        long timestamp = generateUniqueTimestamp();
+        PointPing ping = new PointPing(x, y, z, generatorId, dimension, timestamp, 30);
+        pings.put(timestamp, ping);
+        save(server);
+        return ping;
+    }
+
+    public EntityPing addEntityPing(Entity entity, String dimension, UUID generatorId, PingType type, MinecraftServer server) {
+        cleanUpPings(dimension, generatorId, type);
+        long timestamp = generateUniqueTimestamp();
+        EntityPing ping = new EntityPing(entity.getUUID(), timestamp, dimension, generatorId, 10);
+        pings.put(timestamp, ping);
+        save(server);
+        return ping;
+    }
+
+    public ServerPing addServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, MinecraftServer server) {
+        ServerPing ping = new ServerPing(name, dimension, x, y, z, color, showDistance);
+        long timestamp = generateUniqueTimestamp();
+        pings.put(timestamp, ping);
+        save(server);
+        return ping;
     }
 }

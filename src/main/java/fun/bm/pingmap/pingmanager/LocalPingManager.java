@@ -1,10 +1,11 @@
 package fun.bm.pingmap.pingmanager;
 
+import fun.bm.pingmap.api.pingmanager.PingManager;
+import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.enums.PingType;
-import fun.bm.pingmap.pingmanager.pings.EntityPing;
-import fun.bm.pingmap.pingmanager.pings.Ping;
-import fun.bm.pingmap.pingmanager.pings.PointPing;
-import fun.bm.pingmap.pingmanager.pings.ServerPing;
+import fun.bm.pingmap.pingmanager.ping.EntityPing;
+import fun.bm.pingmap.pingmanager.ping.PointPing;
+import fun.bm.pingmap.pingmanager.ping.ServerPing;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -12,7 +13,7 @@ import net.minecraft.world.entity.Entity;
 
 import java.util.UUID;
 
-public class LocalPingManager extends ServerPingManager {
+public class LocalPingManager extends ServerPingManager implements PingManager {
     private static LocalPingManager instance;
 
     public static synchronized LocalPingManager get(Minecraft minecraft) {
@@ -53,6 +54,18 @@ public class LocalPingManager extends ServerPingManager {
             return;
         }
         super.save(server);
+    }
+
+    public PointPing addPointPing(double x, double y, double z, String dimension, UUID generatorId, MinecraftServer server) {
+        return addPointPing(x, y, z, dimension, generatorId);
+    }
+
+    public EntityPing addEntityPing(Entity entity, String dimension, UUID generatorId, PingType type, MinecraftServer server) {
+        return addEntityPing(entity, dimension, generatorId, type);
+    }
+
+    public ServerPing addServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, MinecraftServer server) {
+        return addServerPing(name, dimension, x, y, z, color, showDistance);
     }
 
     public PointPing addPointPing(double x, double y, double z, String dimension, UUID generatorId) {

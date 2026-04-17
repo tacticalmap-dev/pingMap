@@ -1,9 +1,9 @@
 package fun.bm.pingmap.enums;
 
-import fun.bm.pingmap.pingmanager.pings.EntityPing;
-import fun.bm.pingmap.pingmanager.pings.Ping;
-import fun.bm.pingmap.pingmanager.pings.PointPing;
-import fun.bm.pingmap.pingmanager.pings.ServerPing;
+import fun.bm.pingmap.api.pingmanager.ping.Ping;
+import fun.bm.pingmap.pingmanager.ping.EntityPing;
+import fun.bm.pingmap.pingmanager.ping.PointPing;
+import fun.bm.pingmap.pingmanager.ping.ServerPing;
 import org.jetbrains.annotations.NotNull;
 
 public enum PingType {

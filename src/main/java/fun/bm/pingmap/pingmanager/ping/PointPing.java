@@ -1,5 +1,6 @@
-package fun.bm.pingmap.pingmanager.pings;
+package fun.bm.pingmap.pingmanager.ping;
 
+import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.enums.PingType;
 import net.minecraft.nbt.CompoundTag;
 

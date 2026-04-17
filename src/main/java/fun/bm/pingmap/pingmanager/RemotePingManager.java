@@ -1,11 +1,11 @@
 package fun.bm.pingmap.pingmanager;
 
+import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.network.NetworkHandler;
 import fun.bm.pingmap.network.packet.PingC2SPacket;
-import fun.bm.pingmap.pingmanager.pings.EntityPing;
-import fun.bm.pingmap.pingmanager.pings.Ping;
-import fun.bm.pingmap.pingmanager.pings.PointPing;
+import fun.bm.pingmap.pingmanager.ping.EntityPing;
+import fun.bm.pingmap.pingmanager.ping.PointPing;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
