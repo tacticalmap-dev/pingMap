@@ -162,20 +162,23 @@ public class PingManager {
     }
 
     public enum PingType {
-        Point(PointPing.class, "●", 0xFFFFFF00, Font.DisplayMode.SEE_THROUGH, 1),
-        Enemy(EntityPing.class, "●", 0xFFFF0000, Font.DisplayMode.SEE_THROUGH, -1),
-        Friendly(EntityPing.class, "●", 0x8000FFFF, Font.DisplayMode.NORMAL, -1);
+        Point(PointPing.class, "●", 0xFFFFFF00, true, Font.DisplayMode.SEE_THROUGH, 1),
+        Enemy(EntityPing.class, "●", 0xFFFF0000, true, Font.DisplayMode.SEE_THROUGH, -1),
+        Friendly(EntityPing.class, "●", 0x8000FFFF, false, Font.DisplayMode.NORMAL, -1),
+        Server(ServerPing.class, null, null, null, Font.DisplayMode.SEE_THROUGH, -1);
 
         private final Class<? extends Ping> origin;
         private final String icon;
-        private final int color;
+        private final Integer color;
         private final Font.DisplayMode displayMode;
         private final int maxPings;
+        private final Boolean showDistance;
 
-        PingType(Class<? extends Ping> clazz, String icon, int color, Font.DisplayMode displayMode, int maxPings) {
+        PingType(Class<? extends Ping> clazz, String icon, Integer color, Boolean showDistance, Font.DisplayMode displayMode, int maxPings) {
             this.origin = clazz;
             this.icon = icon;
             this.color = color;
+            this.showDistance = showDistance;
             this.displayMode = displayMode;
             this.maxPings = maxPings;
         }
@@ -213,6 +216,10 @@ public class PingManager {
         public int getMaxPings() {
             return maxPings == -1 ? Integer.MAX_VALUE : maxPings;
         }
+
+        public boolean showDistance() {
+            return showDistance;
+        }
     }
 
     public interface Ping {
@@ -235,6 +242,18 @@ public class PingManager {
         String getDimension();
 
         PingType getType();
+
+        default String getIcon() {
+            return getType().getIcon();
+        }
+
+        default int getColor() {
+            return getType().getColor();
+        }
+
+        default boolean showDistance() {
+            return getType().showDistance();
+        }
     }
 
     public static class PointPing implements Ping {
@@ -319,7 +338,6 @@ public class PingManager {
             return dimension;
         }
 
-        @Override
         public PingType getType() {
             return PingType.Point;
         }
@@ -397,42 +415,143 @@ public class PingManager {
             return cachedEntity;
         }
 
-        @Override
         public double getX() {
             Entity entity = getEntity();
             return entity != null ? entity.getX() : 0;
         }
 
-        @Override
         public double getY() {
             Entity entity = getEntity();
             return entity != null ? entity.getY() : 0;
         }
 
-        @Override
         public double getZ() {
             Entity entity = getEntity();
             return entity != null ? entity.getZ() : 0;
         }
 
-        @Override
         public long getTimestamp() {
             return timestamp;
         }
 
-        @Override
         public UUID getGeneratorId() {
             return generatorId;
         }
 
-        @Override
         public String getDimension() {
             return dimension;
         }
 
-        @Override
         public PingType getType() {
             return PingType.Enemy;
+        }
+    }
+
+    public static class ServerPing implements Ping {
+        private String name;
+        private final String dimension;
+        private int color;
+        private final double x;
+        private final double y;
+        private final double z;
+        private boolean showDistance;
+
+        public ServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance) {
+            this.name = name;
+            this.dimension = dimension;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.color = color;
+            this.showDistance = showDistance;
+        }
+
+        public ServerPing() {
+            this.dimension = null;
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+        }
+
+        public boolean expired() {
+            return false;
+        }
+
+        public CompoundTag toNBT() {
+            CompoundTag tag = new CompoundTag();
+            tag.putString("name", name);
+            tag.putString("dimension", dimension);
+            tag.putDouble("x", x);
+            tag.putDouble("y", y);
+            tag.putDouble("z", z);
+            tag.putInt("color", color);
+            tag.putBoolean("showDistance", showDistance);
+            tag.putByte("type", (byte) PingType.Server.ordinal());
+            return tag;
+        }
+
+        public Ping fromNBT(CompoundTag tag) {
+            return new ServerPing(
+                    tag.getString("name"),
+                    tag.getString("dimension"),
+                    tag.getDouble("x"),
+                    tag.getDouble("y"),
+                    tag.getDouble("z"),
+                    tag.getInt("color"),
+                    tag.getBoolean("showDistance")
+            );
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        public double getZ() {
+            return z;
+        }
+
+        public long getTimestamp() {
+            return -1;
+        }
+
+        public UUID getGeneratorId() {
+            return null;
+        }
+
+        public String getDimension() {
+            return dimension;
+        }
+
+        public PingType getType() {
+            return PingType.Server;
+        }
+
+        public String getIcon() {
+            return name;
+        }
+
+        public int getColor() {
+            return color;
+        }
+
+        public boolean showDistance() {
+            return showDistance;
+        }
+
+        public void setColor(int color) { // for server api
+            this.color = color;
+        }
+
+        public void setName(String name) { // for server api
+            this.name = name;
+        }
+
+        public void setShowDistance(boolean showDistance) { // for server api
+            this.showDistance = showDistance;
         }
     }
 }

@@ -166,10 +166,10 @@ public class PingRenderer {
             eventPoseStack.translate(0, -10, 0);
 
             minecraft.font.drawInBatch(
-                    Component.literal(ping.getType().getIcon()),
-                    -minecraft.font.width(ping.getType().getIcon()) / 2.0F,
+                    Component.literal(ping.getIcon()),
+                    -minecraft.font.width(ping.getIcon()) / 2.0F,
                     0,
-                    ping.getType().getColor(),
+                    ping.getColor(),
                     false,
                     eventPoseStack.last().pose(),
                     minecraft.renderBuffers().bufferSource(),
@@ -181,18 +181,20 @@ public class PingRenderer {
 
             eventPoseStack.popPose();
 
-            minecraft.font.drawInBatch(
-                    Component.literal(distanceText),
-                    -textWidth / 2.0F,
-                    0,
-                    0xFFFFFFFF,
-                    false,
-                    eventPoseStack.last().pose(),
-                    minecraft.renderBuffers().bufferSource(),
-                    ping.getType().getDisplayMode(),
-                    0,
-                    15728880
-            );
+            if (ping.showDistance()) {
+                minecraft.font.drawInBatch(
+                        Component.literal(distanceText),
+                        -textWidth / 2.0F,
+                        0,
+                        0xFFFFFFFF,
+                        false,
+                        eventPoseStack.last().pose(),
+                        minecraft.renderBuffers().bufferSource(),
+                        ping.getType().getDisplayMode(),
+                        0,
+                        15728880
+                );
+            }
             minecraft.renderBuffers().bufferSource().endBatch();
 
             eventPoseStack.popPose();
