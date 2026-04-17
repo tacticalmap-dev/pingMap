@@ -1,6 +1,6 @@
 package fun.bm.pingmap.network.packet;
 
-import com.mojang.logging.LogUtils;
+import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.pingmanager.LocalPingManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -52,7 +52,7 @@ public class SyncAllPingsS2CPacket {
                 if (manager != null) {
                     for (int i = 0; i < packet.pingTags.size(); i++) {
                         manager.addPing(packet.pingTags.get(i), packet.typeOrdinals.get(i));
-                        LogUtils.getLogger().info("Received ping: " + packet.pingTags.get(i));
+                        Pingmap.LOGGER.debug("Received ping: {}", packet.pingTags.get(i));
                     }
                 }
             });

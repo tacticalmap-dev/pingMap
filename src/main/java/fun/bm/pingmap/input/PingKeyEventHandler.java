@@ -7,7 +7,6 @@ import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.LocalPingManager;
 import fun.bm.pingmap.pingmanager.RemotePingManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.phys.AABB;
@@ -90,9 +89,7 @@ class PingKeyEventHandler {
                 LocalPingManager manager = LocalPingManager.get(minecraft);
                 if (manager != null) {
                     manager.addEntityPing(target, dimension, minecraft.player.getUUID(), PingType.Enemy);
-                    minecraft.player.sendSystemMessage(
-                            Component.literal(String.format("§a已标记实体: %s", target.getName().getString()))
-                    );
+                    Pingmap.LOGGER.debug("已标记实体: %s", target.getName().getString());
 
                     if (!minecraft.hasSingleplayerServer()) {
                         RemotePingManager.sendEntityPing(target);
@@ -110,19 +107,14 @@ class PingKeyEventHandler {
                 if (manager != null) {
                     manager.addPointPing(hitVec.x, hitVec.y, hitVec.z, dimension, minecraft.player.getUUID());
 
-                    minecraft.player.sendSystemMessage(
-                            Component.literal(String.format("§a已添加标记点: X=%.2f Y=%.2f Z=%.2f",
-                                    hitVec.x, hitVec.y, hitVec.z))
-                    );
+                    Pingmap.LOGGER.debug("已添加标记点: X=%.2f Y=%.2f Z=%.2f", hitVec.x, hitVec.y, hitVec.z);
 
                     if (!minecraft.hasSingleplayerServer()) {
                         RemotePingManager.sendPointPing(hitVec.x, hitVec.y, hitVec.z);
                     }
                 }
             } else {
-                minecraft.player.sendSystemMessage(
-                        Component.literal("§c无效目标！")
-                );
+                Pingmap.LOGGER.debug("无效目标！");
             }
         }
     }

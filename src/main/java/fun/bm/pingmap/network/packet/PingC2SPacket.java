@@ -1,6 +1,6 @@
 package fun.bm.pingmap.network.packet;
 
-import com.mojang.logging.LogUtils;
+import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.pingmanager.ServerPingManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -43,7 +43,7 @@ public class PingC2SPacket {
                 sender.getServer().getPlayerList().getPlayers().forEach(player -> {
                     if (player != sender) {
                         fun.bm.pingmap.network.NetworkHandler.sendToPlayer(broadcastPacket, player);
-                        LogUtils.getLogger().info("Sent ping to player: " + player.getDisplayName().getString());
+                        Pingmap.LOGGER.debug("Sent ping to player: {}", player.getDisplayName().getString());
                     }
                 });
             }

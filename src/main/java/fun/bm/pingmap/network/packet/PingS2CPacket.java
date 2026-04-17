@@ -1,6 +1,6 @@
 package fun.bm.pingmap.network.packet;
 
-import com.mojang.logging.LogUtils;
+import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.pingmanager.LocalPingManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -37,7 +37,7 @@ public class PingS2CPacket {
                 LocalPingManager manager = LocalPingManager.get(minecraft);
                 if (manager != null && packet.pingData != null) {
                     manager.addPing(packet.pingData, packet.typeOrdinal);
-                    LogUtils.getLogger().info("Received ping data: " + packet.pingData);
+                    Pingmap.LOGGER.debug("Received ping data: {}", packet.pingData);
                 }
             });
         });
