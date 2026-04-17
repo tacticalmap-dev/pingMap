@@ -1,8 +1,13 @@
-package fun.bm.pingmap;
+package fun.bm.pingmap.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import fun.bm.pingmap.Pingmap;
+import fun.bm.pingmap.enums.PingType;
+import fun.bm.pingmap.pingmanager.LocalPingManager;
+import fun.bm.pingmap.pingmanager.pings.Ping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
@@ -27,13 +32,13 @@ public class PingRenderer {
             return;
         }
 
-        PingManager manager = PingManager.get(minecraft);
+        LocalPingManager manager = LocalPingManager.get(minecraft);
         if (manager == null) {
             return;
         }
 
         String currentDimension = minecraft.level.dimension().location().toString();
-        List<PingManager.Ping> pings = manager.getPingsForDimension(currentDimension);
+        List<Ping> pings = manager.getPingsForDimension(currentDimension);
 
         if (pings.isEmpty()) {
             return;
@@ -58,7 +63,7 @@ public class PingRenderer {
         RenderSystem.depthMask(false);
         RenderSystem.disableCull();
 
-        for (PingManager.Ping ping : pings) {
+        for (Ping ping : pings) {
             if (ping.expired()) {
                 manager.cancelPing(ping);
             } else {
@@ -77,7 +82,7 @@ public class PingRenderer {
     }
 
     private static void renderPing(PoseStack poseStack, BufferBuilder bufferBuilder,
-                                   PingManager.Ping ping, float tickCount) {
+                                   Ping ping, float tickCount) {
         float pulse = (float) Math.sin(tickCount * 0.1F) * 0.2F + 0.8F;
 
         Matrix4f matrix = poseStack.last().pose();
@@ -124,7 +129,7 @@ public class PingRenderer {
         Tesselator.getInstance().end();
     }
 
-    private static void renderPingLabels(PoseStack eventPoseStack, Minecraft minecraft, List<PingManager.Ping> pings,
+    private static void renderPingLabels(PoseStack eventPoseStack, Minecraft minecraft, List<Ping> pings,
                                          double cameraX, double cameraY, double cameraZ) {
         if (pings.isEmpty()) {
             return;
@@ -138,7 +143,7 @@ public class PingRenderer {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        for (PingManager.Ping ping : pings) {
+        for (Ping ping : pings) {
             double dx = ping.getX() - player.getX();
             double dy = ping.getY() - player.getY();
             double dz = ping.getZ() - player.getZ();
@@ -162,6 +167,10 @@ public class PingRenderer {
             String distanceText = String.format("%.1fm", distance);
             int textWidth = minecraft.font.width(distanceText);
 
+            Font.DisplayMode displayMode = ping.getType() == PingType.Friendly
+                    ? Font.DisplayMode.NORMAL
+                    : Font.DisplayMode.SEE_THROUGH;
+
             eventPoseStack.pushPose();
             eventPoseStack.translate(0, -10, 0);
 
@@ -173,7 +182,7 @@ public class PingRenderer {
                     false,
                     eventPoseStack.last().pose(),
                     minecraft.renderBuffers().bufferSource(),
-                    ping.getType().getDisplayMode(),
+                    displayMode,
                     0,
                     15728880
             );
@@ -190,7 +199,7 @@ public class PingRenderer {
                         false,
                         eventPoseStack.last().pose(),
                         minecraft.renderBuffers().bufferSource(),
-                        ping.getType().getDisplayMode(),
+                        displayMode,
                         0,
                         15728880
                 );

@@ -1,9 +1,11 @@
-package fun.bm.pingmap;
+package fun.bm.pingmap.input;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.KeyMapping;
+import fun.bm.pingmap.Pingmap;
+import fun.bm.pingmap.enums.PingType;
+import fun.bm.pingmap.pingmanager.LocalPingManager;
+import fun.bm.pingmap.pingmanager.RemotePingManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -14,27 +16,11 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.TimeUnit;
-
-@Mod.EventBusSubscriber(modid = Pingmap.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class KeyInputHandler {
-    public static final KeyMapping PING_KEY = new KeyMapping(
-            "key.pingmap.ping",
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_GRAVE_ACCENT,
-            "key.categories.pingmap"
-    );
-
-    @SubscribeEvent
-    public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
-        event.register(PING_KEY);
-    }
-}
 
 @Mod.EventBusSubscriber(modid = Pingmap.MODID, value = Dist.CLIENT)
 class PingKeyEventHandler {
@@ -101,12 +87,16 @@ class PingKeyEventHandler {
             Entity target = entityHit.getEntity();
             if (target != null) {
                 String dimension = minecraft.level.dimension().location().toString();
-                PingManager manager = PingManager.get(minecraft);
+                LocalPingManager manager = LocalPingManager.get(minecraft);
                 if (manager != null) {
-                    manager.addEntityPing(target, dimension, minecraft.player.getUUID(), PingManager.PingType.Enemy);
+                    manager.addEntityPing(target, dimension, minecraft.player.getUUID(), PingType.Enemy);
                     minecraft.player.sendSystemMessage(
                             Component.literal(String.format("§a已标记实体: %s", target.getName().getString()))
                     );
+
+                    if (!minecraft.hasSingleplayerServer()) {
+                        RemotePingManager.sendEntityPing(target);
+                    }
                 }
             }
         } else {
@@ -116,7 +106,7 @@ class PingKeyEventHandler {
                 Vec3 hitVec = blockHit.getLocation();
                 String dimension = minecraft.level.dimension().location().toString();
 
-                PingManager manager = PingManager.get(minecraft);
+                LocalPingManager manager = LocalPingManager.get(minecraft);
                 if (manager != null) {
                     manager.addPointPing(hitVec.x, hitVec.y, hitVec.z, dimension, minecraft.player.getUUID());
 
@@ -124,6 +114,10 @@ class PingKeyEventHandler {
                             Component.literal(String.format("§a已添加标记点: X=%.2f Y=%.2f Z=%.2f",
                                     hitVec.x, hitVec.y, hitVec.z))
                     );
+
+                    if (!minecraft.hasSingleplayerServer()) {
+                        RemotePingManager.sendPointPing(hitVec.x, hitVec.y, hitVec.z);
+                    }
                 }
             } else {
                 minecraft.player.sendSystemMessage(

@@ -1,5 +1,6 @@
 package fun.bm.pingmap;
 
+import fun.bm.pingmap.network.NetworkHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -20,6 +21,6 @@ public class Pingmap {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-
+        event.enqueueWork(NetworkHandler::register);
     }
 }
