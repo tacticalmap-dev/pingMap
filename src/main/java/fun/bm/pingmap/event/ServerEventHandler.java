@@ -51,6 +51,4 @@ public class ServerEventHandler {
     public static void onServerStopping(ServerStoppingEvent event) {
         ServerPingManager.drop();
     }
-
-
 }
