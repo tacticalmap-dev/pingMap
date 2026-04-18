@@ -1,4 +1,4 @@
-package fun.bm.pingmap.config;
+package fun.bm.pingmap.config.local;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 

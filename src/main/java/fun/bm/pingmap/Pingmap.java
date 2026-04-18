@@ -1,8 +1,8 @@
 package fun.bm.pingmap;
 
 import com.mojang.logging.LogUtils;
-import fun.bm.pingmap.config.ClientConfig;
-import fun.bm.pingmap.config.CommonConfig;
+import fun.bm.pingmap.config.local.ClientConfig;
+import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.network.NetworkHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;

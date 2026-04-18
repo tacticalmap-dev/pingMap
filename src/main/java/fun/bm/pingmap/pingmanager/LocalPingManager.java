@@ -2,7 +2,7 @@ package fun.bm.pingmap.pingmanager;
 
 import fun.bm.pingmap.api.pingmanager.PingManager;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
-import fun.bm.pingmap.config.CommonConfig;
+import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.ping.EntityPing;
 import fun.bm.pingmap.pingmanager.ping.PointPing;

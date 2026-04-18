@@ -1,7 +1,7 @@
 package fun.bm.pingmap.network.packet;
 
 import fun.bm.pingmap.Pingmap;
-import fun.bm.pingmap.config.CommonConfig;
+import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.ServerPingManager;
 import net.minecraft.nbt.CompoundTag;

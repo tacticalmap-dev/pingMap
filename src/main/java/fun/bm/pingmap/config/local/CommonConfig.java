@@ -1,6 +1,8 @@
-package fun.bm.pingmap.config;
+package fun.bm.pingmap.config.local;
 
+import fun.bm.pingmap.config.remote.RemoteCommonConfig;
 import fun.bm.pingmap.enums.PingType;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public final class CommonConfig {
@@ -20,7 +22,24 @@ public final class CommonConfig {
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
+    public static boolean hasServerConfig() {
+        return RemoteCommonConfig.serverPointPingLifetime != null || RemoteCommonConfig.serverEnemyPingLifetime != null || RemoteCommonConfig.serverFriendlyPingLifetime != null;
+    }
+
     public static int getPingLifetimeSeconds(PingType type) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft != null && !minecraft.hasSingleplayerServer() && hasServerConfig()) {
+            return switch (type) {
+                case Point ->
+                        RemoteCommonConfig.serverPointPingLifetime != null ? RemoteCommonConfig.serverPointPingLifetime : -1;
+                case Enemy ->
+                        RemoteCommonConfig.serverEnemyPingLifetime != null ? RemoteCommonConfig.serverEnemyPingLifetime : -1;
+                case Friendly ->
+                        RemoteCommonConfig.serverFriendlyPingLifetime != null ? RemoteCommonConfig.serverFriendlyPingLifetime : -1;
+                default -> -1;
+            };
+        }
+
         return switch (type) {
             case Point -> POINT_PING_LIFETIME_SECONDS.get();
             case Enemy -> ENEMY_PING_LIFETIME_SECONDS.get();

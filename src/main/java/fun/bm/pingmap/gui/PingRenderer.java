@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
-import fun.bm.pingmap.config.ClientConfig;
+import fun.bm.pingmap.config.local.ClientConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.LocalPingManager;
 import net.minecraft.client.Minecraft;

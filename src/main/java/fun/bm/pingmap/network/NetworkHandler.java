@@ -4,6 +4,7 @@ import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.network.packet.PingC2SPacket;
 import fun.bm.pingmap.network.packet.PingS2CPacket;
 import fun.bm.pingmap.network.packet.SyncAllPingsS2CPacket;
+import fun.bm.pingmap.network.packet.SyncConfigPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
@@ -44,6 +45,14 @@ public class NetworkHandler {
                 SyncAllPingsS2CPacket::encode,
                 SyncAllPingsS2CPacket::decode,
                 SyncAllPingsS2CPacket::handle
+        );
+
+        INSTANCE.registerMessage(
+                packetId++,
+                SyncConfigPacket.class,
+                SyncConfigPacket::encode,
+                SyncConfigPacket::decode,
+                SyncConfigPacket::handle
         );
     }
 

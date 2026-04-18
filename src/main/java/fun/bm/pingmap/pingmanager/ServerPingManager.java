@@ -4,7 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import fun.bm.pingmap.api.pingmanager.PingManager;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
-import fun.bm.pingmap.config.CommonConfig;
+import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.ping.EntityPing;
 import fun.bm.pingmap.pingmanager.ping.PointPing;
@@ -20,7 +20,6 @@ import net.minecraft.world.level.storage.LevelResource;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class ServerPingManager implements PingManager {
     private static final String DATA_FILE = "pingmap_data.dat";
