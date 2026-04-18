@@ -2,7 +2,7 @@ package fun.bm.pingmap.pingmanager;
 
 import fun.bm.pingmap.api.pingmanager.PingManager;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
-import fun.bm.pingmap.config.PingmapConfig;
+import fun.bm.pingmap.config.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.ping.EntityPing;
 import fun.bm.pingmap.pingmanager.ping.PointPing;
@@ -74,7 +74,7 @@ public class LocalPingManager extends ServerPingManager implements PingManager {
         PingType type = PingType.Point;
         cleanUpPings(dimension, generatorId, type);
         long timestamp = generateUniqueTimestamp();
-        int expireAfter = PingmapConfig.getPingLifetimeSeconds(type);
+        int expireAfter = CommonConfig.getPingLifetimeSeconds(type);
         PointPing ping = new PointPing(x, y, z, generatorId, dimension, timestamp, expireAfter);
         pings.put(timestamp, ping);
         save(minecraft);
@@ -85,7 +85,7 @@ public class LocalPingManager extends ServerPingManager implements PingManager {
         Minecraft minecraft = Minecraft.getInstance();
         cleanUpPings(dimension, generatorId, type);
         long timestamp = generateUniqueTimestamp();
-        int expireAfter = PingmapConfig.getPingLifetimeSeconds(type);
+        int expireAfter = CommonConfig.getPingLifetimeSeconds(type);
         EntityPing ping = new EntityPing(entity.getUUID(), timestamp, dimension, generatorId, expireAfter, type);
         pings.put(timestamp, ping);
         save(minecraft);
@@ -95,7 +95,7 @@ public class LocalPingManager extends ServerPingManager implements PingManager {
     public ServerPing addServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance) {
         Minecraft minecraft = Minecraft.getInstance();
         long timestamp = generateUniqueTimestamp();
-        int expireAfter = PingmapConfig.getPingLifetimeSeconds(PingType.Server);
+        int expireAfter = CommonConfig.getPingLifetimeSeconds(PingType.Server);
         ServerPing ping = new ServerPing(name, dimension, x, y, z, color, showDistance, timestamp, expireAfter);
         pings.put(timestamp, ping);
         save(minecraft);

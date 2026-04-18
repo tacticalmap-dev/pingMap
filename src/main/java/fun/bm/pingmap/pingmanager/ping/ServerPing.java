@@ -1,7 +1,7 @@
 package fun.bm.pingmap.pingmanager.ping;
 
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
-import fun.bm.pingmap.config.PingmapConfig;
+import fun.bm.pingmap.config.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import net.minecraft.nbt.CompoundTag;
 
@@ -19,7 +19,7 @@ public class ServerPing implements Ping {
     private boolean showDistance;
 
     public ServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance) {
-        this(name, dimension, x, y, z, color, showDistance, System.currentTimeMillis(), PingmapConfig.getPingLifetimeSeconds(PingType.Server));
+        this(name, dimension, x, y, z, color, showDistance, System.currentTimeMillis(), CommonConfig.getPingLifetimeSeconds(PingType.Server));
     }
 
     public ServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, long timestamp, int expireAfter) {
@@ -69,7 +69,7 @@ public class ServerPing implements Ping {
         long readTimestamp = tag.contains("timestamp") ? tag.getLong("timestamp") : System.currentTimeMillis();
         int readExpireAfter = tag.contains("expireAfter")
                 ? tag.getInt("expireAfter")
-                : PingmapConfig.getPingLifetimeSeconds(PingType.Server);
+                : CommonConfig.getPingLifetimeSeconds(PingType.Server);
         return new ServerPing(
                 tag.getString("name"),
                 tag.getString("dimension"),

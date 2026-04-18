@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
-import fun.bm.pingmap.config.PingmapConfig;
+import fun.bm.pingmap.config.ClientConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.LocalPingManager;
 import net.minecraft.client.Minecraft;
@@ -161,7 +161,7 @@ public class PingRenderer {
 
             float baseScale = 0.025F;
             float distanceScale = (float) Math.max(distance / 10.0, 1.0);
-            float scale = baseScale * distanceScale * PingmapConfig.getLabelScaleMultiplier(distance);
+            float scale = baseScale * distanceScale * ClientConfig.getLabelScaleMultiplier(distance);
 
             eventPoseStack.scale(-scale, -scale, scale);
 

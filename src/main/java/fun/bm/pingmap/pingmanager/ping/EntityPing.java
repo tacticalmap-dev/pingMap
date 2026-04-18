@@ -1,7 +1,7 @@
 package fun.bm.pingmap.pingmanager.ping;
 
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
-import fun.bm.pingmap.config.PingmapConfig;
+import fun.bm.pingmap.config.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -70,7 +70,7 @@ public class EntityPing implements Ping {
         }
         int expire = tag.contains("expireAfter")
                 ? tag.getInt("expireAfter")
-                : PingmapConfig.getPingLifetimeSeconds(pingType);
+                : CommonConfig.getPingLifetimeSeconds(pingType);
         return new EntityPing(
                 tag.getUUID("entityId"),
                 tag.getLong("timestamp"),

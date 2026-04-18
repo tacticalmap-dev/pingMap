@@ -4,7 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import fun.bm.pingmap.api.pingmanager.PingManager;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
-import fun.bm.pingmap.config.PingmapConfig;
+import fun.bm.pingmap.config.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.ping.EntityPing;
 import fun.bm.pingmap.pingmanager.ping.PointPing;
@@ -19,19 +19,14 @@ import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class ServerPingManager implements PingManager {
     private static final String DATA_FILE = "pingmap_data.dat";
     protected static ServerPingManager instance;
     protected long lastTimestamp = 0;
-    protected final Cache<Long, Ping> pings = CacheBuilder.newBuilder()
-            .expireAfterWrite(30, TimeUnit.SECONDS).build();
+    protected final Cache<Long, Ping> pings = CacheBuilder.newBuilder().build();
 
     public static synchronized ServerPingManager get(MinecraftServer server) {
         if (instance == null) {
@@ -182,7 +177,7 @@ public class ServerPingManager implements PingManager {
         PingType type = PingType.Point;
         cleanUpPings(dimension, generatorId, type);
         long timestamp = generateUniqueTimestamp();
-        int expireAfter = PingmapConfig.getPingLifetimeSeconds(type);
+        int expireAfter = CommonConfig.getPingLifetimeSeconds(type);
         PointPing ping = new PointPing(x, y, z, generatorId, dimension, timestamp, expireAfter);
         pings.put(timestamp, ping);
         save(server);
@@ -192,16 +187,15 @@ public class ServerPingManager implements PingManager {
     public EntityPing addEntityPing(Entity entity, String dimension, UUID generatorId, PingType type, MinecraftServer server) {
         cleanUpPings(dimension, generatorId, type);
         long timestamp = generateUniqueTimestamp();
-        int expireAfter = PingmapConfig.getPingLifetimeSeconds(type);
+        int expireAfter = CommonConfig.getPingLifetimeSeconds(type);
         EntityPing ping = new EntityPing(entity.getUUID(), timestamp, dimension, generatorId, expireAfter, type);
         pings.put(timestamp, ping);
         save(server);
         return ping;
     }
 
-    public ServerPing addServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, MinecraftServer server) {
+    public ServerPing addServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, int expireAfter, MinecraftServer server) {
         long timestamp = generateUniqueTimestamp();
-        int expireAfter = PingmapConfig.getPingLifetimeSeconds(PingType.Server);
         ServerPing ping = new ServerPing(name, dimension, x, y, z, color, showDistance, timestamp, expireAfter);
         pings.put(timestamp, ping);
         save(server);

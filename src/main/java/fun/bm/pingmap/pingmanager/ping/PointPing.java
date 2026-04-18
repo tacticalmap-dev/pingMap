@@ -1,7 +1,7 @@
 package fun.bm.pingmap.pingmanager.ping;
 
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
-import fun.bm.pingmap.config.PingmapConfig;
+import fun.bm.pingmap.config.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import net.minecraft.nbt.CompoundTag;
 
@@ -59,7 +59,7 @@ public class PointPing implements Ping {
     public PointPing fromNBT(CompoundTag tag) {
         int expire = tag.contains("expireAfter")
                 ? tag.getInt("expireAfter")
-                : PingmapConfig.getPingLifetimeSeconds(PingType.Point);
+                : CommonConfig.getPingLifetimeSeconds(PingType.Point);
         return new PointPing(
                 tag.getDouble("x"),
                 tag.getDouble("y"),

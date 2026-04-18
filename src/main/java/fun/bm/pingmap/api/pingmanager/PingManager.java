@@ -30,5 +30,5 @@ public interface PingManager {
 
     EntityPing addEntityPing(Entity entity, String dimension, UUID generatorId, PingType type, MinecraftServer server);
 
-    ServerPing addServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, MinecraftServer server);
+    ServerPing addServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, int expireAfter, MinecraftServer server);
 }
