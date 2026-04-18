@@ -1,6 +1,8 @@
 package fun.bm.pingmap.network.packet;
 
 import fun.bm.pingmap.Pingmap;
+import fun.bm.pingmap.config.PingmapConfig;
+import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.ServerPingManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -33,9 +35,12 @@ public class PingC2SPacket {
             ServerPlayer sender = context.getSender();
             if (sender != null && sender.getServer() != null) {
                 ServerPingManager serverManager = ServerPingManager.get(sender.getServer());
-                if (serverManager != null && packet.pingData != null) {
+                PingType pingType = PingType.fromOrdinal(packet.typeOrdinal);
+                if (serverManager != null && packet.pingData != null && pingType != null) {
                     long currentTimestamp = serverManager.generateUniqueTimestamp();
                     packet.pingData.putLong("timestamp", currentTimestamp);
+                    packet.pingData.putByte("type", (byte) pingType.ordinal());
+                    packet.pingData.putInt("expireAfter", PingmapConfig.getPingLifetimeSeconds(pingType));
                     serverManager.addPing(packet.pingData, packet.typeOrdinal, sender.getServer());
                 }
 

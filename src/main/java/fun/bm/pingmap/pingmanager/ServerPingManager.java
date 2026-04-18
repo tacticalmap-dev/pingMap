@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import fun.bm.pingmap.api.pingmanager.PingManager;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
+import fun.bm.pingmap.config.PingmapConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.ping.EntityPing;
 import fun.bm.pingmap.pingmanager.ping.PointPing;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -132,16 +134,19 @@ public class ServerPingManager implements PingManager {
     }
 
     protected void cleanUpPings(String dimension, UUID generatorId, PingType type) {
+        if (type == null) {
+            return;
+        }
         if (type.getMaxPings() > 0) {
             int count = 0;
             for (Ping ping : getPings()) {
-                if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId) && ping.getType() == type) {
+                if (Objects.equals(ping.getDimension(), dimension) && Objects.equals(ping.getGeneratorId(), generatorId) && ping.getType() == type) {
                     count++;
                 }
             }
             while (count >= type.getMaxPings()) {
                 for (Ping ping : getPings()) {
-                    if (ping.getDimension().equals(dimension) && ping.getGeneratorId().equals(generatorId) && ping.getType() == type) {
+                    if (Objects.equals(ping.getDimension(), dimension) && Objects.equals(ping.getGeneratorId(), generatorId) && ping.getType() == type) {
                         pings.invalidate(ping.getTimestamp());
                         count--;
                         break;
@@ -177,7 +182,8 @@ public class ServerPingManager implements PingManager {
         PingType type = PingType.Point;
         cleanUpPings(dimension, generatorId, type);
         long timestamp = generateUniqueTimestamp();
-        PointPing ping = new PointPing(x, y, z, generatorId, dimension, timestamp, 30);
+        int expireAfter = PingmapConfig.getPingLifetimeSeconds(type);
+        PointPing ping = new PointPing(x, y, z, generatorId, dimension, timestamp, expireAfter);
         pings.put(timestamp, ping);
         save(server);
         return ping;
@@ -186,15 +192,17 @@ public class ServerPingManager implements PingManager {
     public EntityPing addEntityPing(Entity entity, String dimension, UUID generatorId, PingType type, MinecraftServer server) {
         cleanUpPings(dimension, generatorId, type);
         long timestamp = generateUniqueTimestamp();
-        EntityPing ping = new EntityPing(entity.getUUID(), timestamp, dimension, generatorId, 10);
+        int expireAfter = PingmapConfig.getPingLifetimeSeconds(type);
+        EntityPing ping = new EntityPing(entity.getUUID(), timestamp, dimension, generatorId, expireAfter, type);
         pings.put(timestamp, ping);
         save(server);
         return ping;
     }
 
     public ServerPing addServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, MinecraftServer server) {
-        ServerPing ping = new ServerPing(name, dimension, x, y, z, color, showDistance);
         long timestamp = generateUniqueTimestamp();
+        int expireAfter = PingmapConfig.getPingLifetimeSeconds(PingType.Server);
+        ServerPing ping = new ServerPing(name, dimension, x, y, z, color, showDistance, timestamp, expireAfter);
         pings.put(timestamp, ping);
         save(server);
         return ping;

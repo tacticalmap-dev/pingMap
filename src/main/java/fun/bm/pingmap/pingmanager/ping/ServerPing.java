@@ -1,6 +1,7 @@
 package fun.bm.pingmap.pingmanager.ping;
 
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
+import fun.bm.pingmap.config.PingmapConfig;
 import fun.bm.pingmap.enums.PingType;
 import net.minecraft.nbt.CompoundTag;
 
@@ -13,9 +14,15 @@ public class ServerPing implements Ping {
     private final double x;
     private final double y;
     private final double z;
+    private final long timestamp;
+    private final int expireAfter;
     private boolean showDistance;
 
     public ServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance) {
+        this(name, dimension, x, y, z, color, showDistance, System.currentTimeMillis(), PingmapConfig.getPingLifetimeSeconds(PingType.Server));
+    }
+
+    public ServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, long timestamp, int expireAfter) {
         this.name = name;
         this.dimension = dimension;
         this.x = x;
@@ -23,6 +30,8 @@ public class ServerPing implements Ping {
         this.z = z;
         this.color = color;
         this.showDistance = showDistance;
+        this.timestamp = timestamp;
+        this.expireAfter = expireAfter;
     }
 
     public ServerPing() {
@@ -30,10 +39,15 @@ public class ServerPing implements Ping {
         this.x = 0;
         this.y = 0;
         this.z = 0;
+        this.timestamp = 0;
+        this.expireAfter = -1;
     }
 
     public boolean expired() {
-        return false;
+        if (expireAfter < 0) {
+            return false;
+        }
+        return System.currentTimeMillis() - timestamp > expireAfter * 1000L;
     }
 
     public CompoundTag toNBT() {
@@ -45,11 +59,17 @@ public class ServerPing implements Ping {
         tag.putDouble("z", z);
         tag.putInt("color", color);
         tag.putBoolean("showDistance", showDistance);
+        tag.putLong("timestamp", timestamp);
+        tag.putInt("expireAfter", expireAfter);
         tag.putByte("type", (byte) PingType.Server.ordinal());
         return tag;
     }
 
     public Ping fromNBT(CompoundTag tag) {
+        long readTimestamp = tag.contains("timestamp") ? tag.getLong("timestamp") : System.currentTimeMillis();
+        int readExpireAfter = tag.contains("expireAfter")
+                ? tag.getInt("expireAfter")
+                : PingmapConfig.getPingLifetimeSeconds(PingType.Server);
         return new ServerPing(
                 tag.getString("name"),
                 tag.getString("dimension"),
@@ -57,7 +77,9 @@ public class ServerPing implements Ping {
                 tag.getDouble("y"),
                 tag.getDouble("z"),
                 tag.getInt("color"),
-                tag.getBoolean("showDistance")
+                tag.getBoolean("showDistance"),
+                readTimestamp,
+                readExpireAfter
         );
     }
 
@@ -74,7 +96,7 @@ public class ServerPing implements Ping {
     }
 
     public long getTimestamp() {
-        return -1;
+        return timestamp;
     }
 
     public UUID getGeneratorId() {

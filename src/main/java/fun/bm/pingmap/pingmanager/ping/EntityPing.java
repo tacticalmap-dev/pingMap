@@ -1,6 +1,7 @@
 package fun.bm.pingmap.pingmanager.ping;
 
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
+import fun.bm.pingmap.config.PingmapConfig;
 import fun.bm.pingmap.enums.PingType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -13,15 +14,21 @@ public class EntityPing implements Ping {
     private final long timestamp;
     private final String dimension;
     private final UUID generatorId;
+    private final PingType type;
     private final int expireAfter;
     private Entity cachedEntity;
     private long lastCheckTime;
 
     public EntityPing(UUID entityId, long timestamp, String dimension, UUID generatorId, int expireAfter) {
+        this(entityId, timestamp, dimension, generatorId, expireAfter, PingType.Enemy);
+    }
+
+    public EntityPing(UUID entityId, long timestamp, String dimension, UUID generatorId, int expireAfter, PingType type) {
         this.entityId = entityId;
         this.timestamp = timestamp;
         this.dimension = dimension;
         this.generatorId = generatorId;
+        this.type = type == null ? PingType.Enemy : type;
         this.cachedEntity = null;
         this.lastCheckTime = 0;
         this.expireAfter = expireAfter;
@@ -32,13 +39,17 @@ public class EntityPing implements Ping {
         this.timestamp = 0;
         this.dimension = null;
         this.generatorId = null;
+        this.type = PingType.Enemy;
         this.cachedEntity = null;
         this.lastCheckTime = 0;
         this.expireAfter = 0;
     }
 
     public boolean expired() {
-        return expireAfter == -1 || System.currentTimeMillis() - timestamp > expireAfter * 1000L;
+        if (expireAfter < 0) {
+            return false;
+        }
+        return System.currentTimeMillis() - timestamp > expireAfter * 1000L;
     }
 
     public CompoundTag toNBT() {
@@ -48,17 +59,25 @@ public class EntityPing implements Ping {
         tag.putString("dimension", dimension);
         tag.putUUID("generatorId", generatorId);
         tag.putInt("expireAfter", expireAfter);
-        tag.putByte("type", (byte) PingType.Enemy.ordinal());
+        tag.putByte("type", (byte) type.ordinal());
         return tag;
     }
 
     public EntityPing fromNBT(CompoundTag tag) {
+        PingType pingType = tag.contains("type") ? PingType.fromOrdinal(tag.getByte("type")) : PingType.Enemy;
+        if (pingType == null) {
+            pingType = PingType.Enemy;
+        }
+        int expire = tag.contains("expireAfter")
+                ? tag.getInt("expireAfter")
+                : PingmapConfig.getPingLifetimeSeconds(pingType);
         return new EntityPing(
                 tag.getUUID("entityId"),
                 tag.getLong("timestamp"),
                 tag.getString("dimension"),
                 tag.getUUID("generatorId"),
-                tag.getInt("expireAfter")
+                expire,
+                pingType
         );
     }
 
@@ -108,6 +127,6 @@ public class EntityPing implements Ping {
     }
 
     public PingType getType() {
-        return PingType.Enemy;
+        return type;
     }
 }
