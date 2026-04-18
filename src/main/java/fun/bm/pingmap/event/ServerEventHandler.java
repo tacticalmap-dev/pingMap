@@ -1,8 +1,10 @@
 package fun.bm.pingmap.event;
 
 import fun.bm.pingmap.Pingmap;
+import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.network.NetworkHandler;
 import fun.bm.pingmap.network.packet.SyncAllPingsS2CPacket;
+import fun.bm.pingmap.network.packet.SyncConfigPacket;
 import fun.bm.pingmap.pingmanager.ServerPingManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,6 +37,13 @@ public class ServerEventHandler {
                     NetworkHandler.sendToPlayer(syncPacket, player);
                 }
             }
+
+            SyncConfigPacket configPacket = new SyncConfigPacket(
+                    CommonConfig.POINT_PING_LIFETIME_SECONDS.get(),
+                    CommonConfig.ENEMY_PING_LIFETIME_SECONDS.get(),
+                    CommonConfig.FRIENDLY_PING_LIFETIME_SECONDS.get()
+            );
+            NetworkHandler.sendToPlayer(configPacket, player);
         }
     }
 
@@ -42,4 +51,6 @@ public class ServerEventHandler {
     public static void onServerStopping(ServerStoppingEvent event) {
         ServerPingManager.drop();
     }
+
+
 }

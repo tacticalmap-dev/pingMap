@@ -42,6 +42,7 @@ public class PingC2SPacket {
                     packet.pingData.putByte("type", (byte) pingType.ordinal());
                     packet.pingData.putInt("expireAfter", CommonConfig.getPingLifetimeSeconds(pingType));
                     serverManager.addPing(packet.pingData, packet.typeOrdinal, sender.getServer());
+                    Pingmap.LOGGER.debug("Received ping data: {}", packet.pingData);
                 }
 
                 PingS2CPacket broadcastPacket = new PingS2CPacket(packet.pingData, packet.typeOrdinal);

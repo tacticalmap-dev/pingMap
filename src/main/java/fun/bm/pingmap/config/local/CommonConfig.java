@@ -4,6 +4,9 @@ import fun.bm.pingmap.config.remote.RemoteCommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.DistExecutor;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class CommonConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
@@ -27,15 +30,23 @@ public final class CommonConfig {
     }
 
     public static int getPingLifetimeSeconds(PingType type) {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft != null && !minecraft.hasSingleplayerServer() && hasServerConfig()) {
+        AtomicBoolean flag = new AtomicBoolean();
+        DistExecutor.unsafeRunForDist(() -> () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            flag.set(minecraft != null && !minecraft.hasSingleplayerServer() && hasServerConfig());
+            return null;
+        }, () -> () -> {
+            flag.set(false);
+            return null;
+        });
+        if (flag.get()) {
             return switch (type) {
                 case Point ->
-                        RemoteCommonConfig.serverPointPingLifetime != null ? RemoteCommonConfig.serverPointPingLifetime : -1;
+                        RemoteCommonConfig.serverPointPingLifetime != null ? RemoteCommonConfig.serverPointPingLifetime : 0;
                 case Enemy ->
-                        RemoteCommonConfig.serverEnemyPingLifetime != null ? RemoteCommonConfig.serverEnemyPingLifetime : -1;
+                        RemoteCommonConfig.serverEnemyPingLifetime != null ? RemoteCommonConfig.serverEnemyPingLifetime : 0;
                 case Friendly ->
-                        RemoteCommonConfig.serverFriendlyPingLifetime != null ? RemoteCommonConfig.serverFriendlyPingLifetime : -1;
+                        RemoteCommonConfig.serverFriendlyPingLifetime != null ? RemoteCommonConfig.serverFriendlyPingLifetime : 0;
                 default -> -1;
             };
         }

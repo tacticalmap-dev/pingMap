@@ -89,7 +89,7 @@ class PingKeyEventHandler {
                 LocalPingManager manager = LocalPingManager.get(minecraft);
                 if (manager != null) {
                     manager.addEntityPing(target, dimension, minecraft.player.getUUID(), PingType.Enemy);
-                    Pingmap.LOGGER.debug("已标记实体: %s", target.getName().getString());
+                    Pingmap.LOGGER.debug("已标记实体: {}", target.getName().getString());
 
                     if (!minecraft.hasSingleplayerServer()) {
                         RemotePingManager.sendEntityPing(target);
@@ -107,7 +107,7 @@ class PingKeyEventHandler {
                 if (manager != null) {
                     manager.addPointPing(hitVec.x, hitVec.y, hitVec.z, dimension, minecraft.player.getUUID());
 
-                    Pingmap.LOGGER.debug("已添加标记点: X=%.2f Y=%.2f Z=%.2f", hitVec.x, hitVec.y, hitVec.z);
+                    Pingmap.LOGGER.debug("已添加标记点: X={} Y={} Z={}", hitVec.x, hitVec.y, hitVec.z);
 
                     if (!minecraft.hasSingleplayerServer()) {
                         RemotePingManager.sendPointPing(hitVec.x, hitVec.y, hitVec.z);

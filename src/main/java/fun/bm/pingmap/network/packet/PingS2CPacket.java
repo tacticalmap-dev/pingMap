@@ -31,16 +31,14 @@ public class PingS2CPacket {
 
     public static void handle(PingS2CPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                Minecraft minecraft = Minecraft.getInstance();
-                LocalPingManager manager = LocalPingManager.get(minecraft);
-                if (manager != null && packet.pingData != null) {
-                    manager.addPing(packet.pingData, packet.typeOrdinal);
-                    Pingmap.LOGGER.debug("Received ping data: {}", packet.pingData);
-                }
-            });
-        });
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            LocalPingManager manager = LocalPingManager.get(minecraft);
+            if (manager != null && packet.pingData != null) {
+                manager.addPing(packet.pingData, packet.typeOrdinal);
+                Pingmap.LOGGER.debug("Received ping data: {}", packet.pingData);
+            }
+        }));
         context.setPacketHandled(true);
     }
 }

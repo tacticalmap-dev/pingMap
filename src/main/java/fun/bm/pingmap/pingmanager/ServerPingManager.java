@@ -138,13 +138,10 @@ public class ServerPingManager implements PingManager {
                     count++;
                 }
             }
-            while (count >= type.getMaxPings()) {
-                for (Ping ping : getPings()) {
-                    if (Objects.equals(ping.getDimension(), dimension) && Objects.equals(ping.getGeneratorId(), generatorId) && ping.getType() == type) {
-                        pings.invalidate(ping.getTimestamp());
-                        count--;
-                        break;
-                    }
+            for (Ping ping : getPings()) {
+                if (ping.expired() || count >= type.getMaxPings() && Objects.equals(ping.getDimension(), dimension) && Objects.equals(ping.getGeneratorId(), generatorId) && ping.getType() == type) {
+                    pings.invalidate(ping.getTimestamp());
+                    count--;
                 }
             }
         }
