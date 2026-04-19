@@ -1,23 +1,23 @@
 package fun.bm.pingmap.network;
 
 import fun.bm.pingmap.Pingmap;
-import fun.bm.pingmap.network.packet.PingC2SPacket;
-import fun.bm.pingmap.network.packet.PingS2CPacket;
-import fun.bm.pingmap.network.packet.SyncAllPingsS2CPacket;
-import fun.bm.pingmap.network.packet.SyncConfigPacket;
+import fun.bm.pingmap.network.packet.c2s.PingC2SPacket;
+import fun.bm.pingmap.network.packet.s2c.PingS2CPacket;
+import fun.bm.pingmap.network.packet.s2c.SyncAllPingsS2CPacket;
+import fun.bm.pingmap.network.packet.s2c.SyncConfigS2CPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
-public class NetworkHandler {
-    private static final String PROTOCOL_VERSION = "1";
+public class MainNetworkHandler {
+    public static final String MAIN_PROTOCOL_VERSION = "1";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(Pingmap.MODID, "main"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
+            ResourceLocation.fromNamespaceAndPath(Pingmap.MODID, "main"),
+            () -> MAIN_PROTOCOL_VERSION,
+            MAIN_PROTOCOL_VERSION::equals,
+            MAIN_PROTOCOL_VERSION::equals
     );
 
     private static int packetId = 0;
@@ -49,10 +49,10 @@ public class NetworkHandler {
 
         INSTANCE.registerMessage(
                 packetId++,
-                SyncConfigPacket.class,
-                SyncConfigPacket::encode,
-                SyncConfigPacket::decode,
-                SyncConfigPacket::handle
+                SyncConfigS2CPacket.class,
+                SyncConfigS2CPacket::encode,
+                SyncConfigS2CPacket::decode,
+                SyncConfigS2CPacket::handle
         );
     }
 

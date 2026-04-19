@@ -2,8 +2,8 @@ package fun.bm.pingmap.pingmanager;
 
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.enums.PingType;
-import fun.bm.pingmap.network.NetworkHandler;
-import fun.bm.pingmap.network.packet.PingC2SPacket;
+import fun.bm.pingmap.network.MainNetworkHandler;
+import fun.bm.pingmap.network.packet.c2s.PingC2SPacket;
 import fun.bm.pingmap.pingmanager.ping.EntityPing;
 import fun.bm.pingmap.pingmanager.ping.PointPing;
 import net.minecraft.client.Minecraft;
@@ -19,7 +19,7 @@ public class RemotePingManager {
         CompoundTag tag = ping.toNBT();
         int typeOrdinal = ping.getType().ordinal();
         PingC2SPacket packet = new PingC2SPacket(tag, typeOrdinal);
-        NetworkHandler.sendToServer(packet);
+        MainNetworkHandler.sendToServer(packet);
     }
 
     public static void sendPointPing(double x, double y, double z) {

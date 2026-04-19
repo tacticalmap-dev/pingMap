@@ -3,7 +3,8 @@ package fun.bm.pingmap;
 import com.mojang.logging.LogUtils;
 import fun.bm.pingmap.config.local.ClientConfig;
 import fun.bm.pingmap.config.local.CommonConfig;
-import fun.bm.pingmap.network.NetworkHandler;
+import fun.bm.pingmap.network.HandshakeNetworkHandler;
+import fun.bm.pingmap.network.MainNetworkHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -31,6 +32,7 @@ public class Pingmap {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        event.enqueueWork(NetworkHandler::register);
+        event.enqueueWork(MainNetworkHandler::register);
+        event.enqueueWork(HandshakeNetworkHandler::register);
     }
 }

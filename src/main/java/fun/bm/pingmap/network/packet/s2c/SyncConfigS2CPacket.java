@@ -1,4 +1,4 @@
-package fun.bm.pingmap.network.packet;
+package fun.bm.pingmap.network.packet.s2c;
 
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.config.remote.RemoteCommonConfig;
@@ -10,33 +10,33 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class SyncConfigPacket {
+public class SyncConfigS2CPacket {
     private final CompoundTag configData;
 
-    public SyncConfigPacket(int pointPingLifetime, int enemyPingLifetime, int friendlyPingLifetime) {
+    public SyncConfigS2CPacket(int pointPingLifetime, int enemyPingLifetime, int friendlyPingLifetime) {
         this.configData = new CompoundTag();
         this.configData.putInt("pointPingLifetime", pointPingLifetime);
         this.configData.putInt("enemyPingLifetime", enemyPingLifetime);
         this.configData.putInt("friendlyPingLifetime", friendlyPingLifetime);
     }
 
-    public static void encode(SyncConfigPacket packet, FriendlyByteBuf buf) {
+    public static void encode(SyncConfigS2CPacket packet, FriendlyByteBuf buf) {
         buf.writeNbt(packet.configData);
     }
 
-    public static SyncConfigPacket decode(FriendlyByteBuf buf) {
+    public static SyncConfigS2CPacket decode(FriendlyByteBuf buf) {
         CompoundTag tag = buf.readNbt();
         if (tag == null) {
             tag = new CompoundTag();
         }
-        return new SyncConfigPacket(
+        return new SyncConfigS2CPacket(
                 tag.getInt("pointPingLifetime"),
                 tag.getInt("enemyPingLifetime"),
                 tag.getInt("friendlyPingLifetime")
         );
     }
 
-    public static void handle(SyncConfigPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
+    public static void handle(SyncConfigS2CPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {

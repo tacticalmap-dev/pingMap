@@ -1,4 +1,5 @@
 ﻿{
   "key.pingmap.ping": "添加标记点",
-  "key.categories.pingmap": "标记地图"
+  "key.categories.pingmap": "标记地图",
+  "game.connection.disconnect": "协议版本不匹配！请确保客户端和服务端的PingMap模组版本一致。"
 }

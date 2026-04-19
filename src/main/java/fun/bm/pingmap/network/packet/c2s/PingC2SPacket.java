@@ -1,8 +1,10 @@
-package fun.bm.pingmap.network.packet;
+package fun.bm.pingmap.network.packet.c2s;
 
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
+import fun.bm.pingmap.network.MainNetworkHandler;
+import fun.bm.pingmap.network.packet.s2c.PingS2CPacket;
 import fun.bm.pingmap.pingmanager.ServerPingManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -48,7 +50,7 @@ public class PingC2SPacket {
                 PingS2CPacket broadcastPacket = new PingS2CPacket(packet.pingData, packet.typeOrdinal);
                 sender.getServer().getPlayerList().getPlayers().forEach(player -> {
                     if (player != sender) {
-                        fun.bm.pingmap.network.NetworkHandler.sendToPlayer(broadcastPacket, player);
+                        MainNetworkHandler.sendToPlayer(broadcastPacket, player);
                         Pingmap.LOGGER.debug("Sent ping to player: {}", player.getDisplayName().getString());
                     }
                 });

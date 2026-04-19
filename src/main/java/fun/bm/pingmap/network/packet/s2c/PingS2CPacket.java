@@ -1,4 +1,4 @@
-package fun.bm.pingmap.network.packet;
+package fun.bm.pingmap.network.packet.s2c;
 
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.pingmanager.LocalPingManager;

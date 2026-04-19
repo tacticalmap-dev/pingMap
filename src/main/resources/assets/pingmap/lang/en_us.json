@@ -1,4 +1,5 @@
 ﻿{
   "key.pingmap.ping": "Add Ping Marker",
-  "key.categories.pingmap": "PingMap"
+  "key.categories.pingmap": "PingMap",
+  "game.connection.disconnect": "Protocol version mismatch! Please ensure that the PingMap mod versions on the client and server are the same."
 }
