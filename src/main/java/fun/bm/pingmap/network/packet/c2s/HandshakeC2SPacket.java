@@ -38,37 +38,34 @@ public class HandshakeC2SPacket {
             if (player == null) {
                 Pingmap.LOGGER.warn("Received handshake packet from null player.");
             } else {
-                if (!packet.version.equals(MainNetworkHandler.MAIN_PROTOCOL_VERSION)) {
-                    try {
-                        player.connection.disconnect(Component.translatable("game.connection.disconnect"));
-                    } catch (Exception e) {
-                        Pingmap.LOGGER.warn("Failed to disconnect client: ", e);
-                    }
+                if (packet.version.equals(MainNetworkHandler.MAIN_PROTOCOL_VERSION)) {
+                    Pingmap.LOGGER.info("Player {} connect server with Ping Map version of {}", player.getDisplayName().getString(), packet.version);
                 } else {
-                    Pingmap.LOGGER.debug("Player {} connect server with Ping Map version of {}", player.getDisplayName().getString(), packet.version);
-                    ServerPingManager serverManager = ServerPingManager.get(player.getServer());
-                    if (serverManager != null) {
-                        List<CompoundTag> pingTags = new ArrayList<>();
-                        List<Integer> typeOrdinals = new ArrayList<>();
-
-                        serverManager.getPings().forEach(ping -> {
-                            pingTags.add(ping.toNBT());
-                            typeOrdinals.add(ping.getType().ordinal());
-                        });
-
-                        if (!pingTags.isEmpty()) {
-                            SyncAllPingsS2CPacket syncPacket = new SyncAllPingsS2CPacket(pingTags, typeOrdinals);
-                            MainNetworkHandler.sendToPlayer(syncPacket, player);
-                        }
-                    }
-
-                    SyncConfigS2CPacket configPacket = new SyncConfigS2CPacket(
-                            CommonConfig.POINT_PING_LIFETIME_SECONDS.get(),
-                            CommonConfig.ENEMY_PING_LIFETIME_SECONDS.get(),
-                            CommonConfig.FRIENDLY_PING_LIFETIME_SECONDS.get()
-                    );
-                    MainNetworkHandler.sendToPlayer(configPacket, player);
+                    Pingmap.LOGGER.warn("Player {} connect server with Ping Map version of {}, but expected version of {}", player.getDisplayName().getString(), packet.version, MainNetworkHandler.MAIN_PROTOCOL_VERSION);
+                    player.sendSystemMessage(Component.literal("Ping Map: Mismatch version. Client: " + packet.version + ", Server: " + MainNetworkHandler.MAIN_PROTOCOL_VERSION));
                 }
+                ServerPingManager serverManager = ServerPingManager.get(player.getServer());
+                if (serverManager != null) {
+                    List<CompoundTag> pingTags = new ArrayList<>();
+                    List<Integer> typeOrdinals = new ArrayList<>();
+
+                    serverManager.getPings().forEach(ping -> {
+                        pingTags.add(ping.toNBT());
+                        typeOrdinals.add(ping.getType().ordinal());
+                    });
+
+                    if (!pingTags.isEmpty()) {
+                        SyncAllPingsS2CPacket syncPacket = new SyncAllPingsS2CPacket(pingTags, typeOrdinals);
+                        MainNetworkHandler.sendToPlayer(syncPacket, player);
+                    }
+                }
+
+                SyncConfigS2CPacket configPacket = new SyncConfigS2CPacket(
+                        CommonConfig.POINT_PING_LIFETIME_SECONDS.get(),
+                        CommonConfig.ENEMY_PING_LIFETIME_SECONDS.get(),
+                        CommonConfig.FRIENDLY_PING_LIFETIME_SECONDS.get()
+                );
+                MainNetworkHandler.sendToPlayer(configPacket, player);
             }
         });
         context.setPacketHandled(true);
