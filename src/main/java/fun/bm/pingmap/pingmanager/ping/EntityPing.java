@@ -81,6 +81,10 @@ public class EntityPing implements Ping {
         );
     }
 
+    public UUID getEntityId() {
+        return entityId;
+    }
+
     private Entity getEntity() {
         long currentTime = System.currentTimeMillis();
         if (cachedEntity == null || currentTime - lastCheckTime > 1000) {

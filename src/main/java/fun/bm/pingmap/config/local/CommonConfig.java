@@ -23,6 +23,10 @@ public final class CommonConfig {
             .comment("Friendly ping lifetime in seconds. -1 means never expire.")
             .defineInRange("pingLifetime.friendlySeconds", -1, -1, 86400);
 
+    public static final ForgeConfigSpec.BooleanValue AUTO_ADD_FRIENDLY_PING = BUILDER
+            .comment("Auto add friendly ping when a player join a server. (use vanilla's team)")
+            .define("ping.autoAddFriendlyPing", true);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean hasServerConfig() {
