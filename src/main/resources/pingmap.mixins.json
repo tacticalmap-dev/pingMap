@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "pingmap.refmap.json",
   "mixins": [
+    "TeamsUpdate"
   ],
   "client": [
   ],

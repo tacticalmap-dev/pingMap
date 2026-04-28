@@ -2,9 +2,9 @@ package fun.bm.pingmap.network;
 
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.network.packet.c2s.PingC2SPacket;
-import fun.bm.pingmap.network.packet.s2c.PingS2CPacket;
-import fun.bm.pingmap.network.packet.s2c.SyncAllPingsS2CPacket;
 import fun.bm.pingmap.network.packet.s2c.SyncConfigS2CPacket;
+import fun.bm.pingmap.network.packet.s2c.SyncMultiPingsS2CPacket;
+import fun.bm.pingmap.network.packet.s2c.SyncSinglePingS2CPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
@@ -12,7 +12,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class MainNetworkHandler {
-    public static final String MAIN_PROTOCOL_VERSION = "1";
+    public static final String MAIN_PROTOCOL_VERSION = "260429_000714";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(Pingmap.MODID, "main"),
             () -> MAIN_PROTOCOL_VERSION,
@@ -33,18 +33,18 @@ public class MainNetworkHandler {
 
         INSTANCE.registerMessage(
                 packetId++,
-                PingS2CPacket.class,
-                PingS2CPacket::encode,
-                PingS2CPacket::decode,
-                PingS2CPacket::handle
+                SyncSinglePingS2CPacket.class,
+                SyncSinglePingS2CPacket::encode,
+                SyncSinglePingS2CPacket::decode,
+                SyncSinglePingS2CPacket::handle
         );
 
         INSTANCE.registerMessage(
                 packetId++,
-                SyncAllPingsS2CPacket.class,
-                SyncAllPingsS2CPacket::encode,
-                SyncAllPingsS2CPacket::decode,
-                SyncAllPingsS2CPacket::handle
+                SyncMultiPingsS2CPacket.class,
+                SyncMultiPingsS2CPacket::encode,
+                SyncMultiPingsS2CPacket::decode,
+                SyncMultiPingsS2CPacket::handle
         );
 
         INSTANCE.registerMessage(

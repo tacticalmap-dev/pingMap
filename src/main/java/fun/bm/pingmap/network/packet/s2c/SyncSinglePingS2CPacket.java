@@ -11,32 +11,39 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class PingS2CPacket {
+public class SyncSinglePingS2CPacket {
     private final CompoundTag pingData;
     private final int typeOrdinal;
+    private final boolean add;
 
-    public PingS2CPacket(CompoundTag pingData, int typeOrdinal) {
+    public SyncSinglePingS2CPacket(CompoundTag pingData, int typeOrdinal, boolean add) {
         this.pingData = pingData;
         this.typeOrdinal = typeOrdinal;
+        this.add = add;
     }
 
-    public static void encode(PingS2CPacket packet, FriendlyByteBuf buf) {
+    public static void encode(SyncSinglePingS2CPacket packet, FriendlyByteBuf buf) {
         buf.writeNbt(packet.pingData);
         buf.writeInt(packet.typeOrdinal);
+        buf.writeBoolean(packet.add);
     }
 
-    public static PingS2CPacket decode(FriendlyByteBuf buf) {
-        return new PingS2CPacket(buf.readNbt(), buf.readInt());
+    public static SyncSinglePingS2CPacket decode(FriendlyByteBuf buf) {
+        return new SyncSinglePingS2CPacket(buf.readNbt(), buf.readInt(), buf.readBoolean());
     }
 
-    public static void handle(PingS2CPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
+    public static void handle(SyncSinglePingS2CPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             Minecraft minecraft = Minecraft.getInstance();
             LocalPingManager manager = LocalPingManager.get(minecraft);
-            if (manager != null && packet.pingData != null) {
-                manager.addPing(packet.pingData, packet.typeOrdinal);
-                Pingmap.LOGGER.debug("Received ping data: {}", packet.pingData);
+            if (packet.add) {
+                if (manager != null && packet.pingData != null) {
+                    manager.addPing(packet.pingData, packet.typeOrdinal);
+                    Pingmap.LOGGER.debug("Received ping data: {}", packet.pingData);
+                }
+            } else {
+                // TODO delete ping
             }
         }));
         context.setPacketHandled(true);

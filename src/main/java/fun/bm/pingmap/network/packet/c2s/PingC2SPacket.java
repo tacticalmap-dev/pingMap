@@ -4,7 +4,7 @@ import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.network.MainNetworkHandler;
-import fun.bm.pingmap.network.packet.s2c.PingS2CPacket;
+import fun.bm.pingmap.network.packet.s2c.SyncSinglePingS2CPacket;
 import fun.bm.pingmap.pingmanager.ServerPingManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -47,7 +47,7 @@ public class PingC2SPacket {
                     Pingmap.LOGGER.debug("Received ping data: {}", packet.pingData);
                 }
 
-                PingS2CPacket broadcastPacket = new PingS2CPacket(packet.pingData, packet.typeOrdinal);
+                SyncSinglePingS2CPacket broadcastPacket = new SyncSinglePingS2CPacket(packet.pingData, packet.typeOrdinal, true);
                 sender.getServer().getPlayerList().getPlayers().forEach(player -> {
                     if (player != sender) {
                         MainNetworkHandler.sendToPlayer(broadcastPacket, player);

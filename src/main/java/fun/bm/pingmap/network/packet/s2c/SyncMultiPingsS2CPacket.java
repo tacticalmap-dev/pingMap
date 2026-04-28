@@ -13,16 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class SyncAllPingsS2CPacket {
+public class SyncMultiPingsS2CPacket {
     private final List<CompoundTag> pingTags;
     private final List<Integer> typeOrdinals;
 
-    public SyncAllPingsS2CPacket(List<CompoundTag> pingTags, List<Integer> typeOrdinals) {
+    public SyncMultiPingsS2CPacket(List<CompoundTag> pingTags, List<Integer> typeOrdinals) {
         this.pingTags = pingTags;
         this.typeOrdinals = typeOrdinals;
     }
 
-    public static void encode(SyncAllPingsS2CPacket packet, FriendlyByteBuf buf) {
+    public static void encode(SyncMultiPingsS2CPacket packet, FriendlyByteBuf buf) {
         buf.writeInt(packet.pingTags.size());
         for (int i = 0; i < packet.pingTags.size(); i++) {
             buf.writeNbt(packet.pingTags.get(i));
@@ -30,7 +30,7 @@ public class SyncAllPingsS2CPacket {
         }
     }
 
-    public static SyncAllPingsS2CPacket decode(FriendlyByteBuf buf) {
+    public static SyncMultiPingsS2CPacket decode(FriendlyByteBuf buf) {
         int size = buf.readInt();
         List<CompoundTag> pingTags = new ArrayList<>();
         List<Integer> typeOrdinals = new ArrayList<>();
@@ -40,10 +40,10 @@ public class SyncAllPingsS2CPacket {
             typeOrdinals.add(buf.readInt());
         }
 
-        return new SyncAllPingsS2CPacket(pingTags, typeOrdinals);
+        return new SyncMultiPingsS2CPacket(pingTags, typeOrdinals);
     }
 
-    public static void handle(SyncAllPingsS2CPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
+    public static void handle(SyncMultiPingsS2CPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {

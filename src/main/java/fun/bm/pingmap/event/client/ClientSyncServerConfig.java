@@ -1,4 +1,4 @@
-package fun.bm.pingmap.event;
+package fun.bm.pingmap.event.client;
 
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.config.remote.RemoteCommonConfig;
@@ -11,7 +11,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Pingmap.MODID, value = Dist.CLIENT)
-public class ClientEventHandler {
+public class ClientSyncServerConfig {
     @SubscribeEvent
     public static void onClientConnect(ClientPlayerNetworkEvent.LoggingIn event) {
         HandshakeC2SPacket packet = new HandshakeC2SPacket(MainNetworkHandler.MAIN_PROTOCOL_VERSION);

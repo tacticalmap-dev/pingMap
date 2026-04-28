@@ -27,6 +27,10 @@ public final class CommonConfig {
             .comment("Auto add friendly ping when a player join a server. (use vanilla's team)")
             .define("ping.autoAddFriendlyPing", true);
 
+    public static final ForgeConfigSpec.BooleanValue ONLY_SEND_FRIENDLY_PINGS_TO_TEAMMATES = BUILDER
+            .comment("only send your position to your teammates. (use vanilla's team)")
+            .define("ping.onlySendFriendlyPingsToTeammates", true);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean hasServerConfig() {
