@@ -39,7 +39,7 @@ public class ServerSyncFriendlyPosition {
             manager.save(event.getEntity().getServer());
 
             for (ServerPlayer player : event.getEntity().getServer().getPlayerList().getPlayers()) {
-                if (CommonConfig.ONLY_SEND_FRIENDLY_PINGS_TO_TEAMMATES.get()) {
+                if (CommonConfig.ONLY_SEND_PINGS_TO_TEAMMATES.get()) {
                     Team team = player.getTeam();
                     if (team == null) continue;
                     if (!team.getPlayers().contains(event.getEntity().getScoreboardName())) continue;

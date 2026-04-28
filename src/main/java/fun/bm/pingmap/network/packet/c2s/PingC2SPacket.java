@@ -9,6 +9,7 @@ import fun.bm.pingmap.pingmanager.ServerPingManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.scores.Team;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -49,6 +50,12 @@ public class PingC2SPacket {
 
                 SyncSinglePingS2CPacket broadcastPacket = new SyncSinglePingS2CPacket(packet.pingData, packet.typeOrdinal, true);
                 sender.getServer().getPlayerList().getPlayers().forEach(player -> {
+                    if (CommonConfig.ONLY_SEND_PINGS_TO_TEAMMATES.get()) {
+                        Team team = sender.getTeam();
+                        if (team == null || !team.getPlayers().contains(player.getScoreboardName())) {
+                            return;
+                        }
+                    }
                     if (player != sender) {
                         MainNetworkHandler.sendToPlayer(broadcastPacket, player);
                         Pingmap.LOGGER.debug("Sent ping to player: {}", player.getDisplayName().getString());
