@@ -155,6 +155,14 @@ public class ServerPingManager implements PingManager {
         }
     }
 
+    public void cancelPing(long timestamp) {
+        MinecraftServer server = getServer();
+        pings.invalidate(timestamp);
+        if (server != null) {
+            save(server);
+        }
+    }
+
     public Collection<Ping> getPings() {
         return pings.asMap().values();
     }

@@ -17,14 +17,6 @@ public class TeamsUpdate {
         ServerSyncFriendlyPosition.cachedHandlers.add(new ServerSyncFriendlyPosition.TeamUpdateHandler(p_83434_, true));
     }
 
-    @Inject(method = {"removePlayerFromTeam(Ljava/lang/String;)Z"}, at = @At("RETURN"))
-    private void onRemovePlayerFromTeam(String p_83496_, CallbackInfoReturnable<Boolean> cir) {
-        try {
-            ServerSyncFriendlyPosition.cachedHandlers.add(new ServerSyncFriendlyPosition.TeamUpdateHandler(p_83496_, false));
-        } catch (NullPointerException ignored) {
-        }
-    }
-
     @Inject(method = {"removePlayerFromTeam(Ljava/lang/String;Lnet/minecraft/world/scores/PlayerTeam;)V"}, at = @At("RETURN"))
     private void onRemovePlayerFromTeam(String p_83464_, PlayerTeam p_83465_, CallbackInfo ci) {
         ServerSyncFriendlyPosition.cachedHandlers.add(new ServerSyncFriendlyPosition.TeamUpdateHandler(p_83464_, false));

@@ -55,6 +55,14 @@ public class ServerSyncFriendlyPosition {
     public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
         Ping ping = cachedPing.get(event.getEntity().getScoreboardName());
         cachedPing.remove(event.getEntity().getScoreboardName());
+        Team team = event.getEntity().getTeam();
+        for (ServerPlayer p2 : event.getEntity().getServer().getPlayerList().getPlayers()) {
+            if (team == null) continue;
+            if (team.getPlayers().contains(p2.getScoreboardName())) {
+                Pingmap.LOGGER.debug("Sending friendly ping to player: {} -> {}", event.getEntity().getDisplayName().getString(), p2.getDisplayName().getString());
+                MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping.toNBT(), ping.getType().ordinal(), false), p2);
+            }
+        }
         ServerPingManager manager = ServerPingManager.get(event.getEntity().getServer());
         manager.cancelPing(ping);
         manager.save(event.getEntity().getServer());
@@ -67,13 +75,14 @@ public class ServerSyncFriendlyPosition {
             Ping ping = cachedPing.get(handler.name);
             for (ServerPlayer p2 : event.getServer().getPlayerList().getPlayers()) {
                 Team team = p2.getTeam();
-                if (team == null) continue;
-                if (team.getPlayers().contains(handler.name)) {
+                if (team != null && team.getPlayers().contains(handler.name)) {
                     Pingmap.LOGGER.debug("Sending friendly ping to player: {} -> {}", handler.name, p2.getDisplayName().getString());
                     MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping.toNBT(), ping.getType().ordinal(), handler.add), p2);
-                    cachedHandlers.remove(handler);
+                    Ping ping2 = cachedPing.get(p2.getScoreboardName());
+                    MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping2.toNBT(), ping2.getType().ordinal(), handler.add), p2);
                 }
             }
+            cachedHandlers.remove(handler);
         }
     }
 

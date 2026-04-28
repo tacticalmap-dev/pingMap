@@ -1,6 +1,8 @@
 package fun.bm.pingmap.network.packet.s2c;
 
 import fun.bm.pingmap.Pingmap;
+import fun.bm.pingmap.api.pingmanager.ping.Ping;
+import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.LocalPingManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -37,13 +39,15 @@ public class SyncSinglePingS2CPacket {
         context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             Minecraft minecraft = Minecraft.getInstance();
             LocalPingManager manager = LocalPingManager.get(minecraft);
-            if (packet.add) {
-                if (manager != null && packet.pingData != null) {
+            if (manager != null && packet.pingData != null) {
+                if (packet.add) {
                     manager.addPing(packet.pingData, packet.typeOrdinal);
                     Pingmap.LOGGER.debug("Received ping data: {}", packet.pingData);
+                } else {
+                    Ping ping = PingType.fromOrdinal(packet.typeOrdinal).newInstance().fromNBT(packet.pingData);
+                    manager.cancelPing(ping.getTimestamp());
+                    Pingmap.LOGGER.debug("Cancelled ping data: {}", packet.pingData);
                 }
-            } else {
-                // TODO delete ping
             }
         }));
         context.setPacketHandled(true);
