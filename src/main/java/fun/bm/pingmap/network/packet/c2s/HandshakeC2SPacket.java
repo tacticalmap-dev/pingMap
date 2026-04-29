@@ -2,6 +2,7 @@ package fun.bm.pingmap.network.packet.c2s;
 
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.config.local.CommonConfig;
+import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.network.MainNetworkHandler;
 import fun.bm.pingmap.network.packet.s2c.SyncConfigS2CPacket;
 import fun.bm.pingmap.network.packet.s2c.SyncMultiPingsS2CPacket;
@@ -74,9 +75,9 @@ public class HandshakeC2SPacket {
                 }
 
                 SyncConfigS2CPacket configPacket = new SyncConfigS2CPacket(
-                        CommonConfig.POINT_PING_LIFETIME_SECONDS.get(),
-                        CommonConfig.ENEMY_PING_LIFETIME_SECONDS.get(),
-                        CommonConfig.FRIENDLY_PING_LIFETIME_SECONDS.get()
+                        CommonConfig.getPingLifetimeSeconds(PingType.Point),
+                        CommonConfig.getPingLifetimeSeconds(PingType.Enemy),
+                        CommonConfig.getPingLifetimeSeconds(PingType.Friendly)
                 );
                 MainNetworkHandler.sendToPlayer(configPacket, player);
             }
