@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = Pingmap.MODID)
-public class ServerSyncFriendlyPosition {
+public class FriendlySyncEvents {
     public static final Set<TeamUpdateHandler> cachedHandlers = new HashSet<>();
     private static final Map<String, EntityPing> cachedPing = new HashMap<>();
 

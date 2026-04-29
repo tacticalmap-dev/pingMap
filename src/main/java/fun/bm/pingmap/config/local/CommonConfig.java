@@ -38,7 +38,7 @@ public final class CommonConfig {
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean hasServerConfig() {
-        return RemoteCommonConfig.serverPointPingLifetime != null || RemoteCommonConfig.serverEnemyPingLifetime != null || RemoteCommonConfig.serverFriendlyPingLifetime != null;
+        return RemoteCommonConfig.serverPointPingLifetime != null || RemoteCommonConfig.serverEnemyPingLifetime != null || RemoteCommonConfig.serverFriendlyPingLifetime != null || RemoteCommonConfig.serverMarkEnemyOnly != null;
     }
 
     public static boolean checkIsClient() {

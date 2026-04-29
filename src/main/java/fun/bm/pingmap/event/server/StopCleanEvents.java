@@ -7,7 +7,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Pingmap.MODID)
-public class ServerStopCleanAll {
+public class StopCleanEvents {
 
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
