@@ -3,6 +3,7 @@ package fun.bm.pingmap.input;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import fun.bm.pingmap.Pingmap;
+import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.LocalPingManager;
 import fun.bm.pingmap.pingmanager.RemotePingManager;
@@ -85,37 +86,39 @@ class PingKeyEventHandler {
         if (entityHit != null && entityHit.getType() == HitResult.Type.ENTITY) {
             Entity target = entityHit.getEntity();
             if (target != null) {
-                String dimension = minecraft.level.dimension().location().toString();
-                LocalPingManager manager = LocalPingManager.get(minecraft);
-                if (manager != null) {
-                    manager.addEntityPing(target, dimension, minecraft.player.getUUID(), PingType.Enemy);
-                    Pingmap.LOGGER.debug("已标记实体: {}", target.getName().getString());
+                if (!CommonConfig.isMarkEnemyOnly() || !target.getTeam().getPlayers().contains(minecraft.player.getScoreboardName())) {
+                    String dimension = minecraft.level.dimension().location().toString();
+                    LocalPingManager manager = LocalPingManager.get(minecraft);
+                    if (manager != null) {
+                        manager.addEntityPing(target, dimension, minecraft.player.getUUID(), PingType.Enemy);
+                        Pingmap.LOGGER.debug("已标记实体: {}", target.getName().getString());
 
-                    if (!minecraft.hasSingleplayerServer()) {
-                        RemotePingManager.sendEntityPing(target);
+                        if (!minecraft.hasSingleplayerServer()) {
+                            RemotePingManager.sendEntityPing(target);
+                        }
+                        return;
                     }
+                }
+            }
+        }
+        HitResult blockHit = minecraft.player.pick(maxDistance, 0.0F, false);
+
+        if (blockHit != null && blockHit.getType() == HitResult.Type.BLOCK) {
+            Vec3 hitVec = blockHit.getLocation();
+            String dimension = minecraft.level.dimension().location().toString();
+
+            LocalPingManager manager = LocalPingManager.get(minecraft);
+            if (manager != null) {
+                manager.addPointPing(hitVec.x, hitVec.y, hitVec.z, dimension, minecraft.player.getUUID());
+
+                Pingmap.LOGGER.debug("已添加标记点: X={} Y={} Z={}", hitVec.x, hitVec.y, hitVec.z);
+
+                if (!minecraft.hasSingleplayerServer()) {
+                    RemotePingManager.sendPointPing(hitVec.x, hitVec.y, hitVec.z);
                 }
             }
         } else {
-            HitResult blockHit = minecraft.player.pick(maxDistance, 0.0F, false);
-
-            if (blockHit != null && blockHit.getType() == HitResult.Type.BLOCK) {
-                Vec3 hitVec = blockHit.getLocation();
-                String dimension = minecraft.level.dimension().location().toString();
-
-                LocalPingManager manager = LocalPingManager.get(minecraft);
-                if (manager != null) {
-                    manager.addPointPing(hitVec.x, hitVec.y, hitVec.z, dimension, minecraft.player.getUUID());
-
-                    Pingmap.LOGGER.debug("已添加标记点: X={} Y={} Z={}", hitVec.x, hitVec.y, hitVec.z);
-
-                    if (!minecraft.hasSingleplayerServer()) {
-                        RemotePingManager.sendPointPing(hitVec.x, hitVec.y, hitVec.z);
-                    }
-                }
-            } else {
-                Pingmap.LOGGER.debug("无效目标！");
-            }
+            Pingmap.LOGGER.debug("无效目标！");
         }
     }
 }

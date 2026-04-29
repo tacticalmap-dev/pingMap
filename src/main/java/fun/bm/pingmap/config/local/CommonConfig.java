@@ -11,15 +11,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class CommonConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
-    public static final ForgeConfigSpec.IntValue POINT_PING_LIFETIME_SECONDS = BUILDER
+    private static final ForgeConfigSpec.IntValue POINT_PING_LIFETIME_SECONDS = BUILDER
             .comment("Point ping lifetime in seconds. -1 means never expire.")
             .defineInRange("pingLifetime.pointSeconds", 30, -1, 86400);
 
-    public static final ForgeConfigSpec.IntValue ENEMY_PING_LIFETIME_SECONDS = BUILDER
+    private static final ForgeConfigSpec.IntValue ENEMY_PING_LIFETIME_SECONDS = BUILDER
             .comment("Enemy ping lifetime in seconds. -1 means never expire.")
             .defineInRange("pingLifetime.enemySeconds", 10, -1, 86400);
 
-    public static final ForgeConfigSpec.IntValue FRIENDLY_PING_LIFETIME_SECONDS = BUILDER
+    private static final ForgeConfigSpec.IntValue FRIENDLY_PING_LIFETIME_SECONDS = BUILDER
             .comment("Friendly ping lifetime in seconds. -1 means never expire.")
             .defineInRange("pingLifetime.friendlySeconds", -1, -1, 86400);
 
@@ -31,13 +31,17 @@ public final class CommonConfig {
             .comment("Only send your shared position to your teammates. (use vanilla's team)")
             .define("ping.onlySendPingsToTeammates", true);
 
+    private static final ForgeConfigSpec.BooleanValue MARK_ENEMY_ONLY = BUILDER
+            .comment("Mark enemy only. (use vanilla's team)")
+            .define("ping.markEnemyOnly", true);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean hasServerConfig() {
         return RemoteCommonConfig.serverPointPingLifetime != null || RemoteCommonConfig.serverEnemyPingLifetime != null || RemoteCommonConfig.serverFriendlyPingLifetime != null;
     }
 
-    public static int getPingLifetimeSeconds(PingType type) {
+    public static boolean checkIsClient() {
         AtomicBoolean flag = new AtomicBoolean();
         DistExecutor.unsafeRunForDist(() -> () -> {
             Minecraft minecraft = Minecraft.getInstance();
@@ -47,7 +51,11 @@ public final class CommonConfig {
             flag.set(false);
             return null;
         });
-        if (flag.get()) {
+        return flag.get();
+    }
+
+    public static int getPingLifetimeSeconds(PingType type) {
+        if (checkIsClient()) {
             return switch (type) {
                 case Point ->
                         RemoteCommonConfig.serverPointPingLifetime != null ? RemoteCommonConfig.serverPointPingLifetime : 0;
@@ -65,5 +73,12 @@ public final class CommonConfig {
             case Friendly -> FRIENDLY_PING_LIFETIME_SECONDS.get();
             default -> -1;
         };
+    }
+
+    public static boolean isMarkEnemyOnly() {
+        if (checkIsClient()) {
+            return RemoteCommonConfig.serverMarkEnemyOnly != null ? RemoteCommonConfig.serverMarkEnemyOnly : false;
+        }
+        return MARK_ENEMY_ONLY.get();
     }
 }

@@ -43,12 +43,14 @@ public class SyncConfigS2CPacket {
                 RemoteCommonConfig.setServerConfig(
                         packet.configData.getInt("pointPingLifetime"),
                         packet.configData.getInt("enemyPingLifetime"),
-                        packet.configData.getInt("friendlyPingLifetime")
+                        packet.configData.getInt("friendlyPingLifetime"),
+                        packet.configData.getBoolean("markEnemyOnly")
                 );
-                Pingmap.LOGGER.debug("Received server config: point={}, enemy={}, friendly={}",
+                Pingmap.LOGGER.debug("Received server config: point={}, enemy={}, friendly={}, markEnemyOnly={}",
                         packet.configData.getInt("pointPingLifetime"),
                         packet.configData.getInt("enemyPingLifetime"),
-                        packet.configData.getInt("friendlyPingLifetime"));
+                        packet.configData.getInt("friendlyPingLifetime"),
+                        packet.configData.getBoolean("markEnemyOnly"));
             });
         });
         context.setPacketHandled(true);
