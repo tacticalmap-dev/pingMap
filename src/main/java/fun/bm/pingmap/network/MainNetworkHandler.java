@@ -12,12 +12,12 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class MainNetworkHandler {
-    public static final String MAIN_PROTOCOL_VERSION = "260429_101636"; // TODO - use commit sha to instead
+    public static final String MAIN_PROTOCOL_VERSION = "260430_101500"; // TODO - use commit sha to instead
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(Pingmap.MODID, "main"),
             () -> MAIN_PROTOCOL_VERSION,
-            MAIN_PROTOCOL_VERSION::equals,
-            MAIN_PROTOCOL_VERSION::equals
+            (unused) -> true,
+            (unused) -> true
     );
 
     private static int packetId = 0;
