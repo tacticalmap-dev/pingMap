@@ -2,6 +2,7 @@ package fun.bm.pingmap.network.packet.c2s;
 
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.config.local.CommonConfig;
+import fun.bm.pingmap.data.ServerPlayerModVersionCacheManager;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.network.MainNetworkHandler;
 import fun.bm.pingmap.network.packet.s2c.SyncConfigS2CPacket;
@@ -41,6 +42,7 @@ public class HandshakeC2SPacket {
             if (player == null) {
                 Pingmap.LOGGER.warn("Received handshake packet from null player.");
             } else {
+                ServerPlayerModVersionCacheManager.INSTANCE.addPlayerModVersion(player, packet.version);
                 if (packet.version.equals(MainNetworkHandler.MAIN_PROTOCOL_VERSION)) {
                     Pingmap.LOGGER.info("Player {} connect server with Ping Map version of {}", player.getDisplayName().getString(), packet.version);
                 } else {

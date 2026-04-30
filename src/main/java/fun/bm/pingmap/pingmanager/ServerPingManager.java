@@ -168,8 +168,16 @@ public class ServerPingManager implements PingManager {
     }
 
     public List<Ping> getPingsForDimension(String dimension) {
+        return getPingsForDimension(dimension, false);
+    }
+
+    public List<Ping> getPingsForDimension(String dimension, boolean checkExpired) {
         List<Ping> result = new ArrayList<>();
         for (Ping ping : getPings()) {
+            if (checkExpired && ping.expired()) {
+                pings.invalidate(ping);
+                continue;
+            }
             if (ping.getDimension().equals(dimension)) {
                 result.add(ping);
             }

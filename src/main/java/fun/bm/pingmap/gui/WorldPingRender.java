@@ -1,7 +1,7 @@
 package fun.bm.pingmap.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.config.local.ClientConfig;
@@ -15,12 +15,11 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.joml.Matrix4f;
 
 import java.util.List;
 
 @Mod.EventBusSubscriber(modid = Pingmap.MODID, value = Dist.CLIENT)
-public class PingRenderer {
+public class WorldPingRender {
 
     @SubscribeEvent
     public static void onRenderWorld(RenderLevelStageEvent event) {
@@ -39,7 +38,7 @@ public class PingRenderer {
         }
 
         String currentDimension = minecraft.level.dimension().location().toString();
-        List<Ping> pings = manager.getPingsForDimension(currentDimension);
+        List<Ping> pings = manager.getPingsForDimension(currentDimension, true);
 
         if (pings.isEmpty()) {
             return;
@@ -48,15 +47,11 @@ public class PingRenderer {
         PoseStack poseStack = event.getPoseStack();
         poseStack.pushPose();
 
-        Player player = minecraft.player;
         double cameraX = event.getCamera().getPosition().x();
         double cameraY = event.getCamera().getPosition().y();
         double cameraZ = event.getCamera().getPosition().z();
 
         poseStack.translate(-cameraX, -cameraY, -cameraZ);
-
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tesselator.getBuilder();
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -64,74 +59,13 @@ public class PingRenderer {
         RenderSystem.depthMask(false);
         RenderSystem.disableCull();
 
-        for (Ping ping : pings) {
-            if (ping.expired()) {
-                manager.cancelPing(ping);
-            } else {
-                renderPing(poseStack, bufferBuilder, ping, player.tickCount);
-            }
-        }
-
-        RenderSystem.enableCull();
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableBlend();
-
         poseStack.popPose();
 
-        renderPingLabels(event.getPoseStack(), minecraft, pings, cameraX, cameraY, cameraZ);
+        renderPings(event.getPoseStack(), minecraft, pings, cameraX, cameraY, cameraZ);
     }
 
-    private static void renderPing(PoseStack poseStack, BufferBuilder bufferBuilder,
-                                   Ping ping, float tickCount) {
-        float pulse = (float) Math.sin(tickCount * 0.1F) * 0.2F + 0.8F;
-
-        Matrix4f matrix = poseStack.last().pose();
-
-        bufferBuilder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-
-        double x = ping.getX();
-        double y = ping.getY() + 0.01;
-        double z = ping.getZ();
-
-        float red = 1.0F;
-        float green = pulse;
-        float blue = 0.0F;
-        float alpha = 0.8F;
-
-        double radius = 0.3;
-        int segments = 16;
-
-        for (int i = 0; i <= segments; i++) {
-            double angle1 = 2 * Math.PI * i / segments;
-            double angle2 = 2 * Math.PI * (i + 1) / segments;
-
-            double x1 = x + Math.cos(angle1) * radius;
-            double z1 = z + Math.sin(angle1) * radius;
-            double x2 = x + Math.cos(angle2) * radius;
-            double z2 = z + Math.sin(angle2) * radius;
-
-            bufferBuilder.vertex(matrix, (float) x1, (float) y, (float) z1)
-                    .color(red, green, blue, alpha).endVertex();
-            bufferBuilder.vertex(matrix, (float) x2, (float) y, (float) z2)
-                    .color(red, green, blue, alpha).endVertex();
-        }
-
-        Tesselator.getInstance().end();
-
-        bufferBuilder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-
-        double beamHeight = 64;
-        bufferBuilder.vertex(matrix, (float) x, (float) y, (float) z)
-                .color(red, green, blue, alpha * 0.5F).endVertex();
-        bufferBuilder.vertex(matrix, (float) x, (float) (y + beamHeight), (float) z)
-                .color(red, green, blue, 0.0F).endVertex();
-
-        Tesselator.getInstance().end();
-    }
-
-    private static void renderPingLabels(PoseStack eventPoseStack, Minecraft minecraft, List<Ping> pings,
-                                         double cameraX, double cameraY, double cameraZ) {
+    private static void renderPings(PoseStack eventPoseStack, Minecraft minecraft, List<Ping> pings,
+                                    double cameraX, double cameraY, double cameraZ) {
         if (pings.isEmpty()) {
             return;
         }
