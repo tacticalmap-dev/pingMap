@@ -5,24 +5,22 @@ import com.google.common.cache.CacheBuilder;
 import fun.bm.pingmap.api.pingmanager.PingManager;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.config.local.CommonConfig;
+import fun.bm.pingmap.data.ServerDataStoreManager;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.ping.EntityPing;
 import fun.bm.pingmap.pingmanager.ping.PointPing;
 import fun.bm.pingmap.pingmanager.ping.ServerPing;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class ServerPingManager implements PingManager {
-    private static final String DATA_FILE = "pingmap_data.dat";
     protected static ServerPingManager instance;
     protected long lastTimestamp = 0;
     protected final Cache<Long, Ping> pings = CacheBuilder.newBuilder().build();
@@ -52,31 +50,15 @@ public class ServerPingManager implements PingManager {
     }
 
     protected void load(MinecraftServer server) {
-        if (server == null) {
+        CompoundTag tag = ServerDataStoreManager.getNbt(server);
+        if (tag == null) {
             return;
         }
-
-        File saveDir = server.getWorldPath(LevelResource.ROOT).toFile();
-
-        if (saveDir == null || !saveDir.exists()) {
-            return;
-        }
-
-        File dataFile = new File(saveDir, DATA_FILE);
-        if (dataFile.exists()) {
-            try {
-                CompoundTag tag = NbtIo.read(dataFile);
-                if (tag != null) {
-                    ListTag listTag = tag.getList("pings", Tag.TAG_COMPOUND);
-                    for (int i = 0; i < listTag.size(); i++) {
-                        CompoundTag pingTag = listTag.getCompound(i);
-                        Ping ping = addPing(pingTag, pingTag.getByte("type"));
-                        pings.put(ping.getTimestamp(), ping);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        ListTag listTag = tag.getList("pings", Tag.TAG_COMPOUND);
+        for (int i = 0; i < listTag.size(); i++) {
+            CompoundTag pingTag = listTag.getCompound(i);
+            Ping ping = addPing(pingTag, pingTag.getByte("type"));
+            pings.put(ping.getTimestamp(), ping);
         }
     }
 
@@ -91,18 +73,15 @@ public class ServerPingManager implements PingManager {
             return;
         }
 
-        try {
-            File dataFile = new File(saveDir, DATA_FILE);
-            CompoundTag tag = new CompoundTag();
-            ListTag listTag = new ListTag();
-            for (Ping ping : getPings()) {
-                listTag.add(ping.toNBT());
-            }
-            tag.put("pings", listTag);
-            NbtIo.write(tag, dataFile);
-        } catch (IOException e) {
-            e.printStackTrace();
+        CompoundTag tag = ServerDataStoreManager.getNbtOrigin(server);
+
+        ListTag listTag = new ListTag();
+        for (Ping ping : getPings()) {
+            listTag.add(ping.toNBT());
         }
+        tag.put("pings", listTag);
+
+        ServerDataStoreManager.save();
     }
 
     public Ping addPing(CompoundTag tag, int typeOrdinal) {
