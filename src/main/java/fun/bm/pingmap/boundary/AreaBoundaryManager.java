@@ -34,13 +34,15 @@ public class AreaBoundaryManager {
         return maps.containsKey(uniqueName);
     }
 
-    public static void clear() {
-        save(null);
+    public static void clear(MinecraftServer server) {
+        save(server);
         maps.clear();
     }
 
     public static void save(@Nullable MinecraftServer server) {
         CompoundTag tag = ServerDataStoreManager.getNbtOrigin(server);
+
+        if (tag == null) return;
 
         ListTag listTag = new ListTag();
         for (Map.Entry<String, AreaMap> entry : maps.entrySet()) {

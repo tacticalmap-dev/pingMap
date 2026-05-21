@@ -16,12 +16,13 @@ import java.util.UUID;
 public interface PingManager {
     void save(MinecraftServer server);
 
-    Ping addPing(CompoundTag tag, int typeOrdinal);
+    Ping addPing(CompoundTag tag, PingType type);
 
-    Ping addPing(CompoundTag tag, int typeOrdinal, MinecraftServer server);
+    Ping addPing(CompoundTag tag, PingType type, MinecraftServer server);
 
     void cancelPing(Ping ping);
 
+    // if you edit pings here, make sure to call resent request to update the client
     Collection<Ping> getPings();
 
     List<Ping> getPingsForDimension(String dimension);

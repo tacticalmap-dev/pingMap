@@ -103,6 +103,6 @@ public class LocalPingManager extends ServerPingManager implements PingManager {
     }
 
     public Ping addPing(CompoundTag tag) {
-        return addPing(tag, tag.getByte("type"));
+        return addPing(tag, PingType.fromOrdinal(tag.getByte("type")));
     }
 }

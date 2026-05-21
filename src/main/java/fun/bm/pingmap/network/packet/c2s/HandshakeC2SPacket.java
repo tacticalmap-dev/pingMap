@@ -52,7 +52,7 @@ public class HandshakeC2SPacket {
                 ServerPingManager serverManager = ServerPingManager.get(player.getServer());
                 if (serverManager != null) {
                     List<CompoundTag> pingTags = new ArrayList<>();
-                    List<Integer> typeOrdinals = new ArrayList<>();
+                    List<PingType> pingTypes = new ArrayList<>();
 
                     serverManager.getPings().forEach(ping -> {
                         if (ping.expired()) return;
@@ -67,11 +67,11 @@ public class HandshakeC2SPacket {
                             }
                         }
                         pingTags.add(ping.toNBT());
-                        typeOrdinals.add(ping.getType().ordinal());
+                        pingTypes.add(ping.getType());
                     });
 
                     if (!pingTags.isEmpty()) {
-                        SyncMultiPingsS2CPacket syncPacket = new SyncMultiPingsS2CPacket(pingTags, typeOrdinals);
+                        SyncMultiPingsS2CPacket syncPacket = new SyncMultiPingsS2CPacket(pingTags, pingTypes);
                         MainNetworkHandler.sendToPlayer(syncPacket, player);
                     }
                 }

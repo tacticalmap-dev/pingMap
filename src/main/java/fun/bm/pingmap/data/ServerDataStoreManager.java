@@ -13,7 +13,13 @@ public class ServerDataStoreManager {
     private static final String DATA_FILE = "pingmap_data.dat";
     private static boolean inited = false;
     private static CompoundTag tag = null;
-    private static File saveDir;
+    private static File saveDir = null;
+
+    public static void drop() {
+        tag = null;
+        inited = false;
+        saveDir = null;
+    }
 
     private static void load(@Nullable MinecraftServer server) {
         if (!inited && server != null) {

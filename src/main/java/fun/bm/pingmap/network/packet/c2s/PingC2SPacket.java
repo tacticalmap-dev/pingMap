@@ -3,6 +3,7 @@ package fun.bm.pingmap.network.packet.c2s;
 import fun.bm.pingmap.Pingmap;
 import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
+import fun.bm.pingmap.enums.SyncType;
 import fun.bm.pingmap.network.MainNetworkHandler;
 import fun.bm.pingmap.network.packet.s2c.SyncSinglePingS2CPacket;
 import fun.bm.pingmap.pingmanager.ServerPingManager;
@@ -16,20 +17,20 @@ import java.util.function.Supplier;
 
 public class PingC2SPacket {
     private final CompoundTag pingData;
-    private final int typeOrdinal;
+    private final PingType pingType;
 
-    public PingC2SPacket(CompoundTag pingData, int typeOrdinal) {
+    public PingC2SPacket(CompoundTag pingData, PingType pingType) {
         this.pingData = pingData;
-        this.typeOrdinal = typeOrdinal;
+        this.pingType = pingType;
     }
 
     public static void encode(PingC2SPacket packet, FriendlyByteBuf buf) {
         buf.writeNbt(packet.pingData);
-        buf.writeInt(packet.typeOrdinal);
+        buf.writeInt(packet.pingType.ordinal());
     }
 
     public static PingC2SPacket decode(FriendlyByteBuf buf) {
-        return new PingC2SPacket(buf.readNbt(), buf.readInt());
+        return new PingC2SPacket(buf.readNbt(), PingType.fromOrdinal(buf.readInt()));
     }
 
     public static void handle(PingC2SPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
@@ -38,17 +39,17 @@ public class PingC2SPacket {
             ServerPlayer sender = context.getSender();
             if (sender != null && sender.getServer() != null) {
                 ServerPingManager serverManager = ServerPingManager.get(sender.getServer());
-                PingType pingType = PingType.fromOrdinal(packet.typeOrdinal);
+                PingType pingType = packet.pingType;
                 if (serverManager != null && packet.pingData != null && pingType != null) {
                     long currentTimestamp = serverManager.generateUniqueTimestamp();
                     packet.pingData.putLong("timestamp", currentTimestamp);
                     packet.pingData.putByte("type", (byte) pingType.ordinal());
                     packet.pingData.putInt("expireAfter", CommonConfig.getPingLifetimeSeconds(pingType));
-                    serverManager.addPing(packet.pingData, packet.typeOrdinal, sender.getServer());
+                    serverManager.addPing(packet.pingData, packet.pingType, sender.getServer());
                     Pingmap.LOGGER.debug("Received ping data: {}", packet.pingData);
                 }
 
-                SyncSinglePingS2CPacket broadcastPacket = new SyncSinglePingS2CPacket(packet.pingData, packet.typeOrdinal, true);
+                SyncSinglePingS2CPacket broadcastPacket = new SyncSinglePingS2CPacket(packet.pingData, packet.pingType, SyncType.ADD);
                 sender.getServer().getPlayerList().getPlayers().forEach(player -> {
                     if (CommonConfig.ONLY_SEND_PINGS_TO_TEAMMATES.get()) {
                         Team team = sender.getTeam();

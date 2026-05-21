@@ -37,4 +37,8 @@ public interface Ping {
     default boolean showDistance() {
         return getType().showDistance();
     }
+
+    default void resentPing() {
+
+    }
 }
