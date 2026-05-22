@@ -57,7 +57,7 @@ public class ServerPingManager implements PingManager {
         ListTag listTag = tag.getList("pings", Tag.TAG_COMPOUND);
         for (int i = 0; i < listTag.size(); i++) {
             CompoundTag pingTag = listTag.getCompound(i);
-            Ping ping = addPing(pingTag, PingType.fromOrdinal(pingTag.getByte("type")));
+            Ping ping = addPing(pingTag);
             pings.put(ping.getTimestamp(), ping);
         }
     }
@@ -84,6 +84,14 @@ public class ServerPingManager implements PingManager {
         tag.put("pings", listTag);
 
         ServerDataStoreManager.save();
+    }
+
+    public Ping addPing(CompoundTag tag) {
+        return addPing(tag, PingType.fromOrdinal(tag.getByte("type")));
+    }
+
+    public Ping addPing(CompoundTag tag, MinecraftServer server) {
+        return addPing(tag, PingType.fromOrdinal(tag.getByte("type")), server);
     }
 
     public Ping addPing(CompoundTag tag, PingType type) {

@@ -1,14 +1,12 @@
 package fun.bm.pingmap.pingmanager;
 
 import fun.bm.pingmap.api.pingmanager.PingManager;
-import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.ping.EntityPing;
 import fun.bm.pingmap.pingmanager.ping.PointPing;
 import fun.bm.pingmap.pingmanager.ping.ServerPing;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 
@@ -100,9 +98,5 @@ public class LocalPingManager extends ServerPingManager implements PingManager {
         pings.put(timestamp, ping);
         save(minecraft);
         return ping;
-    }
-
-    public Ping addPing(CompoundTag tag) {
-        return addPing(tag, PingType.fromOrdinal(tag.getByte("type")));
     }
 }

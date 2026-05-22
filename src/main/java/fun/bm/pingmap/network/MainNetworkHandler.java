@@ -12,7 +12,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class MainNetworkHandler {
-    public static final String MAIN_PROTOCOL_VERSION = "260521_170123"; // TODO - use commit sha to instead
+    public static final String MAIN_PROTOCOL_VERSION = "260523_011403"; // TODO - use commit sha to instead
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(Pingmap.MODID, "main"),
             () -> MAIN_PROTOCOL_VERSION,

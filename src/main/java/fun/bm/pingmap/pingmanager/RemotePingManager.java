@@ -17,8 +17,7 @@ public class RemotePingManager {
 
     public static void sendPing(Ping ping) {
         CompoundTag tag = ping.toNBT();
-        PingType pingType = ping.getType();
-        PingC2SPacket packet = new PingC2SPacket(tag, pingType);
+        PingC2SPacket packet = new PingC2SPacket(tag);
         MainNetworkHandler.sendToServer(packet);
     }
 

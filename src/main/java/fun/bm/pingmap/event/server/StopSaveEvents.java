@@ -15,6 +15,6 @@ public class StopSaveEvents {
     public static void onServerStopping(ServerStoppingEvent event) {
         MinecraftServer server = event.getServer();
         ServerPingManager.get(server).save(server);
-        AreaBoundaryManager.save(server);
+        AreaBoundaryManager.get(event.getServer()).save(server);
     }
 }

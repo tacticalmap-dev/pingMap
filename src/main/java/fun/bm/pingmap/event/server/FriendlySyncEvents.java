@@ -47,7 +47,7 @@ public class FriendlySyncEvents {
                 }
 
                 Pingmap.LOGGER.debug("Sending friendly ping to player: {} -> {}", event.getEntity().getDisplayName().getString(), player.getDisplayName().getString());
-                MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping.toNBT(), ping.getType(), SyncType.ADD), player);
+                MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping.toNBT(), SyncType.ADD), player);
             }
         }
     }
@@ -61,7 +61,7 @@ public class FriendlySyncEvents {
             if (team == null) continue;
             if (team.getPlayers().contains(p2.getScoreboardName())) {
                 Pingmap.LOGGER.debug("Sending friendly ping to player: {} -> {}", event.getEntity().getDisplayName().getString(), p2.getDisplayName().getString());
-                MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping.toNBT(), ping.getType(), SyncType.REMOVE), p2);
+                MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping.toNBT(), SyncType.REMOVE), p2);
             }
         }
         ServerPingManager manager = ServerPingManager.get(event.getEntity().getServer());
@@ -78,9 +78,9 @@ public class FriendlySyncEvents {
                 Team team = p2.getTeam();
                 if (team != null && team.getPlayers().contains(handler.name)) {
                     Pingmap.LOGGER.debug("Sending friendly ping to player: {} -> {}", handler.name, p2.getDisplayName().getString());
-                    MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping.toNBT(), ping.getType(), handler.getSyncType()), p2);
+                    MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping.toNBT(), handler.getSyncType()), p2);
                     Ping ping2 = cachedPing.get(p2.getScoreboardName());
-                    MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping2.toNBT(), ping2.getType(), handler.getSyncType()), p2);
+                    MainNetworkHandler.sendToPlayer(new SyncSinglePingS2CPacket(ping2.toNBT(), handler.getSyncType()), p2);
                 }
             }
             cachedHandlers.remove(handler);

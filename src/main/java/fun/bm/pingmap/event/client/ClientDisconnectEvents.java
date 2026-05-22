@@ -5,6 +5,7 @@ import fun.bm.pingmap.boundary.AreaBoundaryManager;
 import fun.bm.pingmap.data.ServerDataStoreManager;
 import fun.bm.pingmap.pingmanager.LocalPingManager;
 import fun.bm.pingmap.pingmanager.ServerPingManager;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
@@ -19,7 +20,8 @@ public class ClientDisconnectEvents {
         ServerPingManager.drop();
         Player player = event.getPlayer();
         if (player != null) {
-            AreaBoundaryManager.clear(player.getServer());
+            MinecraftServer server = player.getServer();
+            AreaBoundaryManager.get(server).clear(server);
         }
         ServerDataStoreManager.drop();
         Pingmap.LOGGER.debug("Cleared all the server datas on disconnect");

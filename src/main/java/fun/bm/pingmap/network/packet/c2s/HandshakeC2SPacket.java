@@ -52,7 +52,6 @@ public class HandshakeC2SPacket {
                 ServerPingManager serverManager = ServerPingManager.get(player.getServer());
                 if (serverManager != null) {
                     List<CompoundTag> pingTags = new ArrayList<>();
-                    List<PingType> pingTypes = new ArrayList<>();
 
                     serverManager.getPings().forEach(ping -> {
                         if (ping.expired()) return;
@@ -67,11 +66,10 @@ public class HandshakeC2SPacket {
                             }
                         }
                         pingTags.add(ping.toNBT());
-                        pingTypes.add(ping.getType());
                     });
 
                     if (!pingTags.isEmpty()) {
-                        SyncMultiPingsS2CPacket syncPacket = new SyncMultiPingsS2CPacket(pingTags, pingTypes);
+                        SyncMultiPingsS2CPacket syncPacket = new SyncMultiPingsS2CPacket(pingTags);
                         MainNetworkHandler.sendToPlayer(syncPacket, player);
                     }
                 }

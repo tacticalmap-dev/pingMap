@@ -16,8 +16,14 @@ import java.util.UUID;
 public interface PingManager {
     void save(MinecraftServer server);
 
+    Ping addPing(CompoundTag tag);
+
+    Ping addPing(CompoundTag tag, MinecraftServer server);
+
+    @Deprecated
     Ping addPing(CompoundTag tag, PingType type);
 
+    @Deprecated
     Ping addPing(CompoundTag tag, PingType type, MinecraftServer server);
 
     void cancelPing(Ping ping);

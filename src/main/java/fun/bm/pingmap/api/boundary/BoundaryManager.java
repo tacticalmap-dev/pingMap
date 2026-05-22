@@ -1,21 +1,22 @@
 package fun.bm.pingmap.api.boundary;
 
 import fun.bm.pingmap.api.boundary.area.AreaMap;
+import net.minecraft.server.MinecraftServer;
 
-public abstract class BoundaryManager {
-    abstract void addAreaMap(AreaMap areaMap);
+import javax.annotation.Nullable;
 
-    abstract void removeAreaMap(AreaMap areaMap);
+public interface BoundaryManager {
+    void addAreaMap(String uniqueName, AreaMap areaMap);
 
-    abstract boolean crossable();
+    void removeAreaMap(String uniqueName);
 
-    abstract boolean visible();
+    AreaMap getAreaMap(String uniqueName);
 
-    abstract int rgba();
+    boolean hasAreaMap(String uniqueName);
 
-    abstract String name();
+    void clear(@Nullable MinecraftServer server);
 
-    abstract String description();
+    void save(@Nullable MinecraftServer server);
 
-    abstract String icon();
+    void load(@Nullable MinecraftServer server);
 }

@@ -10,10 +10,46 @@ import java.util.Set;
 
 public class AMap implements AreaMap {
     private final Set<Area> areas = new HashSet<>();
+    private boolean crossable;
+    private boolean visible;
+    private int rgba;
+    private String name;
+    private String description;
+    private String icon;
 
     @Override
     public void addArea(Area area) {
         areas.add(area);
+    }
+
+    @Override
+    public boolean crossable() {
+        return crossable;
+    }
+
+    @Override
+    public boolean visible() {
+        return visible;
+    }
+
+    @Override
+    public int rgba() {
+        return rgba;
+    }
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public String description() {
+        return description;
+    }
+
+    @Override
+    public String icon() {
+        return icon;
     }
 
     @Override
@@ -38,5 +74,35 @@ public class AMap implements AreaMap {
             amap.areas.add(area);
         }
         return amap;
+    }
+
+    @Override
+    public void setCrossable(boolean crossable) {
+        this.crossable = crossable;
+    }
+
+    @Override
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    @Override
+    public void setRgba(int rgba) {
+        this.rgba = rgba;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }

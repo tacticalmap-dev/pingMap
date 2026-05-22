@@ -1,6 +1,9 @@
 package fun.bm.pingmap.api.pingmanager.ping;
 
 import fun.bm.pingmap.enums.PingType;
+import fun.bm.pingmap.enums.SyncType;
+import fun.bm.pingmap.network.MainNetworkHandler;
+import fun.bm.pingmap.network.packet.s2c.SyncSinglePingS2CPacket;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.UUID;
@@ -39,6 +42,6 @@ public interface Ping {
     }
 
     default void resentPing() {
-
+        MainNetworkHandler.sendToAllPlayers(new SyncSinglePingS2CPacket(toNBT(), SyncType.RESYNC));
     }
 }
