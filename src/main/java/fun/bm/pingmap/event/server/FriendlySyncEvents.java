@@ -87,6 +87,10 @@ public class FriendlySyncEvents {
         }
     }
 
+    public static void addHandler(String name, boolean add) {
+        cachedHandlers.add(new TeamUpdateHandler(name, add));
+    }
+
     public static class TeamUpdateHandler {
         final String name;
         final boolean add;
