@@ -7,9 +7,9 @@ import fun.bm.pingmap.pingmanager.ping.ServerPing;
 import org.jetbrains.annotations.NotNull;
 
 public enum PingType {
-    Point(PointPing.class, "●", 0xFFFFFF00, true, 1),
-    Enemy(EntityPing.class, "●", 0xFFFF0000, true, -1),
-    Friendly(EntityPing.class, "●", 0x8000FFFF, false, -1),
+    Point(PointPing.class, "▼", 0xFFFFFF00, true, 1),
+    Enemy(EntityPing.class, "♦", 0xFFFF0000, true, -1),
+    Friendly(EntityPing.class, "■", 0x8000FFFF, false, -1),
     Server(ServerPing.class, null, null, null, -1);
 
     private final Class<? extends Ping> origin;
