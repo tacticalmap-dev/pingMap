@@ -29,7 +29,7 @@ public interface Ping {
 
     PingType getType();
 
-    default String getIcon() {
+    default Object getIcon() {
         return getType().getIcon();
     }
 

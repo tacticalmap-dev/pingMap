@@ -55,10 +55,24 @@ public class ServerPingManager implements PingManager {
             return;
         }
         ListTag listTag = tag.getList("pings", Tag.TAG_COMPOUND);
+        Set<UUID> uuids = new HashSet<>();
         for (int i = 0; i < listTag.size(); i++) {
             CompoundTag pingTag = listTag.getCompound(i);
+            if (pingTag.getByte("type") == PingType.Friendly.ordinal()) {
+                UUID uuid = pingTag.getUUID("entityId");
+                boolean flag = false;
+                for (UUID uuid1 : uuids) {
+                    if (uuid.equals(uuid1)) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag) {
+                    continue;
+                }
+            }
             Ping ping = addPing(pingTag);
-            pings.put(ping.getTimestamp(), ping);
+            uuids.add(ping.getGeneratorId());
         }
     }
 

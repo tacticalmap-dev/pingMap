@@ -17,6 +17,10 @@ public final class ClientConfig {
             .comment("Label scale multiplier when ping distance is greater than splitDistance.")
             .defineInRange("labelScale.farMultiplier", 1.5, 0.1, 10.0);
 
+    public static final ForgeConfigSpec.IntValue MAX_SHOW_DISTANCE = BUILDER
+            .comment("Whether to show ping distance.")
+            .defineInRange("label.maxShowDistance", 1000, 1, Integer.MAX_VALUE);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static float getLabelScaleMultiplier(double distance) {

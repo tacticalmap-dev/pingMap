@@ -4,21 +4,22 @@ import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.pingmanager.ping.EntityPing;
 import fun.bm.pingmap.pingmanager.ping.PointPing;
 import fun.bm.pingmap.pingmanager.ping.ServerPing;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 public enum PingType {
-    Point(PointPing.class, "▼", 0xFFFFFF00, true, 1),
-    Enemy(EntityPing.class, "♦", 0xFFFF0000, true, -1),
-    Friendly(EntityPing.class, "■", 0x8000FFFF, false, -1),
+    Point(PointPing.class, new ResourceLocation("pingmap", "textures/gui/ping_point.png"), 0xFFFFFF00, true, 1),
+    Enemy(EntityPing.class, new ResourceLocation("pingmap", "textures/gui/ping_enemy.png"), 0xFFFF0000, true, -1),
+    Friendly(EntityPing.class, new ResourceLocation("pingmap", "textures/gui/ping_friendly.png"), 0x8000FFFF, false, -1),
     Server(ServerPing.class, null, null, null, -1);
 
     private final Class<? extends Ping> origin;
-    private final String icon;
+    private final Object icon;
     private final Integer color;
     private final int maxPings;
     private final Boolean showDistance;
 
-    PingType(Class<? extends Ping> clazz, String icon, Integer color, Boolean showDistance, int maxPings) {
+    PingType(Class<? extends Ping> clazz, Object icon, Integer color, Boolean showDistance, int maxPings) {
         this.origin = clazz;
         this.icon = icon;
         this.color = color;
@@ -44,7 +45,8 @@ public enum PingType {
         }
     }
 
-    public String getIcon() {
+    // return ResourceLocation or String, need double-check & use
+    public Object getIcon() {
         return icon;
     }
 

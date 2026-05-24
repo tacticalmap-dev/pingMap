@@ -14,6 +14,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.scores.Team;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -86,7 +87,8 @@ class PingKeyEventHandler {
         if (entityHit != null && entityHit.getType() == HitResult.Type.ENTITY) {
             Entity target = entityHit.getEntity();
             if (target != null) {
-                if (!CommonConfig.isMarkEnemyOnly() || !target.getTeam().getPlayers().contains(minecraft.player.getScoreboardName())) {
+                Team team = target.getTeam();
+                if (!CommonConfig.isMarkEnemyOnly() || team == null || !team.getPlayers().contains(minecraft.player.getScoreboardName())) {
                     String dimension = minecraft.level.dimension().location().toString();
                     LocalPingManager manager = LocalPingManager.get(minecraft);
                     if (manager != null) {

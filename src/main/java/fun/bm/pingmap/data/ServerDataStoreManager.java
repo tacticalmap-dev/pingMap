@@ -36,11 +36,12 @@ public class ServerDataStoreManager {
             try {
                 tag = NbtIo.read(dataFile);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e); // need crash to avoid further data loss
             }
         } else {
             tag = new CompoundTag();
         }
+        save();
         inited = true;
     }
 
@@ -61,6 +62,6 @@ public class ServerDataStoreManager {
 
     public static CompoundTag getNbt(@Nullable MinecraftServer server) {
         CompoundTag ret = getNbtOrigin(server);
-        return ret == null ? ret : ret.copy();
+        return ret == null ? null : ret.copy();
     }
 }

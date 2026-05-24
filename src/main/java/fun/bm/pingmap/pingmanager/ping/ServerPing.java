@@ -4,18 +4,17 @@ import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.UUID;
 
-public class ServerPing implements Ping {
+public class ServerPing extends BasePing {
     private String name;
-    private final String dimension;
+    private ResourceLocation icon;
     private int color;
     private final double x;
     private final double y;
     private final double z;
-    private final long timestamp;
-    private final int expireAfter;
     private boolean showDistance;
 
     public ServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance) {
@@ -23,44 +22,35 @@ public class ServerPing implements Ping {
     }
 
     public ServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, long timestamp, int expireAfter) {
+        this(name, null, dimension, x, y, z, color, showDistance, timestamp, expireAfter);
+    }
+
+    public ServerPing(String name, ResourceLocation icon, String dimension, double x, double y, double z, int color, boolean showDistance, long timestamp, int expireAfter) {
+        super(dimension, timestamp, expireAfter);
         this.name = name;
-        this.dimension = dimension;
+        this.icon = icon;
         this.x = x;
         this.y = y;
         this.z = z;
         this.color = color;
         this.showDistance = showDistance;
-        this.timestamp = timestamp;
-        this.expireAfter = expireAfter;
     }
 
     public ServerPing() {
-        this.dimension = null;
+        super();
         this.x = 0;
         this.y = 0;
         this.z = 0;
-        this.timestamp = 0;
-        this.expireAfter = -1;
-    }
-
-    public boolean expired() {
-        if (expireAfter < 0) {
-            return false;
-        }
-        return System.currentTimeMillis() - timestamp > expireAfter * 1000L;
     }
 
     public CompoundTag toNBT() {
-        CompoundTag tag = new CompoundTag();
+        CompoundTag tag = super.toNBT();
         tag.putString("name", name);
-        tag.putString("dimension", dimension);
         tag.putDouble("x", x);
         tag.putDouble("y", y);
         tag.putDouble("z", z);
         tag.putInt("color", color);
         tag.putBoolean("showDistance", showDistance);
-        tag.putLong("timestamp", timestamp);
-        tag.putInt("expireAfter", expireAfter);
         tag.putByte("type", (byte) PingType.Server.ordinal());
         return tag;
     }
@@ -95,24 +85,16 @@ public class ServerPing implements Ping {
         return z;
     }
 
-    public long getTimestamp() {
-        return timestamp;
-    }
-
     public UUID getGeneratorId() {
         return null;
-    }
-
-    public String getDimension() {
-        return dimension;
     }
 
     public PingType getType() {
         return PingType.Server;
     }
 
-    public String getIcon() {
-        return name;
+    public Object getIcon() {
+        return icon == null ? name : icon;
     }
 
     public int getColor() {
