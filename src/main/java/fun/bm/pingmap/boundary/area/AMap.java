@@ -65,15 +65,14 @@ public class AMap implements AreaMap {
         return tag;
     }
 
-    public static AMap fromNbt(CompoundTag tag) {
-        AMap amap = new AMap();
+    public AMap fromNbt(CompoundTag tag) {
         ListTag listTag = tag.getList("areas", Tag.TAG_COMPOUND);
         for (int i = 0; i < listTag.size(); i++) {
             CompoundTag areaTag = listTag.getCompound(i);
             Area area = Area.fromNbt(areaTag.getCompound("area"));
-            amap.areas.add(area);
+            areas.add(area);
         }
-        return amap;
+        return this;
     }
 
     @Override

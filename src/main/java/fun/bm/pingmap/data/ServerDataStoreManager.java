@@ -1,15 +1,18 @@
 package fun.bm.pingmap.data;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 
 public class ServerDataStoreManager {
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final String DATA_FILE = "pingmap_data.dat";
     private static boolean inited = false;
     private static CompoundTag tag = null;
@@ -36,6 +39,8 @@ public class ServerDataStoreManager {
             try {
                 tag = NbtIo.read(dataFile);
             } catch (IOException e) {
+                LOGGER.error("Failed to load pingmap data:", e);
+                LOGGER.warn("To avoid further data lose, the game will force crashed.");
                 throw new RuntimeException(e); // need crash to avoid further data loss
             }
         } else {
@@ -51,7 +56,7 @@ public class ServerDataStoreManager {
         try {
             NbtIo.write(tag, new File(saveDir, DATA_FILE));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to save pingmap data:", e);
         }
     }
 

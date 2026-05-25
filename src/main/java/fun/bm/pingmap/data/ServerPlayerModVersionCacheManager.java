@@ -27,7 +27,7 @@ public class ServerPlayerModVersionCacheManager implements PlayerModVersionCache
 
     public PlayerModVersion getPlayerModVersion(UUID playerId) {
         for (PlayerModVersion playerModVersion : playerModVersions) {
-            if (playerModVersion.uuid.equals(playerId)) {
+            if (playerModVersion.uuid().equals(playerId)) {
                 return playerModVersion;
             }
         }
@@ -36,7 +36,7 @@ public class ServerPlayerModVersionCacheManager implements PlayerModVersionCache
 
     public PlayerModVersion getPlayerModVersion(String playerName) {
         for (PlayerModVersion playerModVersion : playerModVersions) {
-            if (playerModVersion.name.equals(playerName)) {
+            if (playerModVersion.name().equals(playerName)) {
                 return playerModVersion;
             }
         }
@@ -49,7 +49,7 @@ public class ServerPlayerModVersionCacheManager implements PlayerModVersionCache
 
     public void removePlayerModVersion(UUID playerId) {
         for (PlayerModVersion playerModVersion : playerModVersions) {
-            if (playerModVersion.uuid.equals(playerId)) {
+            if (playerModVersion.uuid().equals(playerId)) {
                 playerModVersions.remove(playerModVersion);
                 return;
             }
@@ -58,7 +58,7 @@ public class ServerPlayerModVersionCacheManager implements PlayerModVersionCache
 
     public void removePlayerModVersion(String playerName) {
         for (PlayerModVersion playerModVersion : playerModVersions) {
-            if (playerModVersion.name.equals(playerName)) {
+            if (playerModVersion.name().equals(playerName)) {
                 playerModVersions.remove(playerModVersion);
                 return;
             }
@@ -71,7 +71,7 @@ public class ServerPlayerModVersionCacheManager implements PlayerModVersionCache
 
     public boolean containsPlayerModVersion(UUID playerId) {
         for (PlayerModVersion playerModVersion : playerModVersions) {
-            if (playerModVersion.uuid.equals(playerId)) {
+            if (playerModVersion.uuid().equals(playerId)) {
                 return true;
             }
         }
@@ -80,7 +80,7 @@ public class ServerPlayerModVersionCacheManager implements PlayerModVersionCache
 
     public boolean containsPlayerModVersion(String playerName) {
         for (PlayerModVersion playerModVersion : playerModVersions) {
-            if (playerModVersion.name.equals(playerName)) {
+            if (playerModVersion.name().equals(playerName)) {
                 return true;
             }
         }

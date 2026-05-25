@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.Collection;
 import java.util.UUID;
 
+// prepare foe anti-cheat
 public interface PlayerModVersionCacheManager {
     void addPlayerModVersion(PlayerModVersion playerModVersion);
 

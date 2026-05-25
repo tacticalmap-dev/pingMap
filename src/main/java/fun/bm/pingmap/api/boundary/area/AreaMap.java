@@ -6,23 +6,21 @@ import net.minecraft.nbt.CompoundTag;
 public interface AreaMap {
     void addArea(Area area);
 
-    abstract boolean crossable();
+    boolean crossable();
 
-    abstract boolean visible();
+    boolean visible();
 
-    abstract int rgba();
+    int rgba();
 
-    abstract String name();
+    String name();
 
-    abstract String description();
+    String description();
 
-    abstract String icon();
+    String icon();
 
     CompoundTag toNbt();
 
-    static AreaMap fromNbt(CompoundTag tag) {
-        return null;
-    }
+    AreaMap fromNbt(CompoundTag tag);
 
     void setCrossable(boolean crossable);
 

@@ -69,10 +69,9 @@ public class LocalPingManager extends ServerPingManager implements PingManager {
 
     public PointPing addPointPing(double x, double y, double z, String dimension, UUID generatorId) {
         Minecraft minecraft = Minecraft.getInstance();
-        PingType type = PingType.Point;
-        cleanUpPings(dimension, generatorId, type);
+        cleanUpPings(dimension, generatorId, PingType.Point);
         long timestamp = generateUniqueTimestamp();
-        int expireAfter = CommonConfig.getPingLifetimeSeconds(type);
+        int expireAfter = CommonConfig.getPingLifetimeSeconds(PingType.Point);
         PointPing ping = new PointPing(x, y, z, generatorId, dimension, timestamp, expireAfter);
         pings.put(timestamp, ping);
         save(minecraft);

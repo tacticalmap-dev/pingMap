@@ -86,7 +86,7 @@ public class AreaBoundaryManager implements BoundaryManager {
         for (int i = 0; i < listTag.size(); i++) {
             CompoundTag areaMapTag = listTag.getCompound(i);
             String uniqueName = areaMapTag.getString("uniqueName");
-            AreaMap areaMap = AMap.fromNbt(areaMapTag.getCompound("areaData"));
+            AreaMap areaMap = new AMap().fromNbt(areaMapTag.getCompound("areaData"));
             addAreaMap(uniqueName, areaMap);
         }
     }

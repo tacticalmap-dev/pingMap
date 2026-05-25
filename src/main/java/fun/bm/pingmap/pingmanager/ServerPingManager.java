@@ -178,7 +178,7 @@ public class ServerPingManager implements PingManager {
         List<Ping> result = new ArrayList<>();
         for (Ping ping : getPings()) {
             if (checkExpired && ping.expired()) {
-                pings.invalidate(ping);
+                pings.invalidate(ping.getTimestamp());
                 continue;
             }
             if (ping.getDimension().equals(dimension)) {

@@ -8,9 +8,9 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 public enum PingType {
-    Point(PointPing.class, new ResourceLocation("pingmap", "textures/gui/ping_point.png"), 0xFFFFFF00, true, 1),
-    Enemy(EntityPing.class, new ResourceLocation("pingmap", "textures/gui/ping_enemy.png"), 0xFFFF0000, true, -1),
-    Friendly(EntityPing.class, new ResourceLocation("pingmap", "textures/gui/ping_friendly.png"), 0x8000FFFF, false, -1),
+    Point(PointPing.class, ResourceLocation.fromNamespaceAndPath("pingmap", "textures/gui/ping_point.png"), 0xFFFFFF00, true, 1),
+    Enemy(EntityPing.class, ResourceLocation.fromNamespaceAndPath("pingmap", "textures/gui/ping_enemy.png"), 0xFFFF0000, true, -1),
+    Friendly(EntityPing.class, ResourceLocation.fromNamespaceAndPath("pingmap", "textures/gui/ping_friendly.png"), 0x8000FFFF, false, -1),
     Server(ServerPing.class, null, null, null, -1);
 
     private final Class<? extends Ping> origin;

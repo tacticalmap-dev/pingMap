@@ -40,18 +40,16 @@ public class SyncMultiPingsS2CPacket {
 
     public static void handle(SyncMultiPingsS2CPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                Minecraft minecraft = Minecraft.getInstance();
-                LocalPingManager manager = LocalPingManager.get(minecraft);
-                if (manager != null) {
-                    for (int i = 0; i < packet.pingTags.size(); i++) {
-                        manager.addPing(packet.pingTags.get(i));
-                        Pingmap.LOGGER.debug("Received ping: {}", packet.pingTags.get(i));
-                    }
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            LocalPingManager manager = LocalPingManager.get(minecraft);
+            if (manager != null) {
+                for (int i = 0; i < packet.pingTags.size(); i++) {
+                    manager.addPing(packet.pingTags.get(i));
+                    Pingmap.LOGGER.debug("Received ping: {}", packet.pingTags.get(i));
                 }
-            });
-        });
+            }
+        }));
         context.setPacketHandled(true);
     }
 }

@@ -38,21 +38,19 @@ public class SyncConfigS2CPacket {
 
     public static void handle(SyncConfigS2CPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                RemoteCommonConfig.setServerConfig(
-                        packet.configData.getInt("pointPingLifetime"),
-                        packet.configData.getInt("enemyPingLifetime"),
-                        packet.configData.getInt("friendlyPingLifetime"),
-                        packet.configData.getBoolean("markEnemyOnly")
-                );
-                Pingmap.LOGGER.debug("Received server config: point={}, enemy={}, friendly={}, markEnemyOnly={}",
-                        packet.configData.getInt("pointPingLifetime"),
-                        packet.configData.getInt("enemyPingLifetime"),
-                        packet.configData.getInt("friendlyPingLifetime"),
-                        packet.configData.getBoolean("markEnemyOnly"));
-            });
-        });
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            RemoteCommonConfig.setServerConfig(
+                    packet.configData.getInt("pointPingLifetime"),
+                    packet.configData.getInt("enemyPingLifetime"),
+                    packet.configData.getInt("friendlyPingLifetime"),
+                    packet.configData.getBoolean("markEnemyOnly")
+            );
+            Pingmap.LOGGER.debug("Received server config: point={}, enemy={}, friendly={}, markEnemyOnly={}",
+                    packet.configData.getInt("pointPingLifetime"),
+                    packet.configData.getInt("enemyPingLifetime"),
+                    packet.configData.getInt("friendlyPingLifetime"),
+                    packet.configData.getBoolean("markEnemyOnly"));
+        }));
         context.setPacketHandled(true);
     }
 }
