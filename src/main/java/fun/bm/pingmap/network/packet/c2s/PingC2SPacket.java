@@ -49,8 +49,10 @@ public class PingC2SPacket {
                 sender.getServer().getPlayerList().getPlayers().forEach(player -> {
                     if (CommonConfig.ONLY_SEND_PINGS_TO_TEAMMATES.get()) {
                         Team team = sender.getTeam();
-                        if (team == null || !team.getPlayers().contains(player.getScoreboardName())) {
-                            return;
+                        if (team == null) {
+                            if (!CommonConfig.SEND_ALL_PINGS_TO_NONE_TEAM.get()) return;
+                        } else {
+                            if (!team.getPlayers().contains(player.getScoreboardName())) return;
                         }
                     }
                     if (player != sender) {

@@ -57,12 +57,15 @@ public class HandshakeC2SPacket {
                         if (ping.expired()) return;
                         if (CommonConfig.ONLY_SEND_PINGS_TO_TEAMMATES.get()) {
                             UUID generatorId = ping.getGeneratorId();
-                            if (generatorId != null) {
+                            if (generatorId != null && generatorId != player.getUUID()) {
                                 Team team = player.getTeam();
-                                if (team == null) return;
-                                ServerPlayer p2 = player.getServer().getPlayerList().getPlayer(generatorId);
-                                if (p2 == null) return;
-                                if (!team.getPlayers().contains(p2.getScoreboardName())) return;
+                                if (team == null) {
+                                    if (!CommonConfig.SEND_ALL_PINGS_TO_NONE_TEAM.get()) return;
+                                } else {
+                                    ServerPlayer p2 = player.getServer().getPlayerList().getPlayer(generatorId);
+                                    if (p2 == null) return;
+                                    if (!team.getPlayers().contains(p2.getScoreboardName())) return;
+                                }
                             }
                         }
                         pingTags.add(ping.toNBT());

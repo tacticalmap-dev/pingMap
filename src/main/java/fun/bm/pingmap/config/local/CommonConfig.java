@@ -35,6 +35,10 @@ public final class CommonConfig {
             .comment("Mark enemy only. (use vanilla's team)")
             .define("ping.markEnemyOnly", true);
 
+    public static final ForgeConfigSpec.BooleanValue SEND_ALL_PINGS_TO_NONE_TEAM = BUILDER
+            .comment("Send all pings to none team. (use vanilla's team)")
+            .define("ping.sendAllPingsToNoneTeam", true);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean hasServerConfig() {
