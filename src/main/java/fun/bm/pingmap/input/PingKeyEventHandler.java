@@ -7,6 +7,7 @@ import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.LocalPingManager;
 import fun.bm.pingmap.pingmanager.RemotePingManager;
+import fun.bm.pingmap.util.TimeUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -60,7 +61,7 @@ class PingKeyEventHandler {
             }
         }
 
-        cache.put(generateNewId(), System.currentTimeMillis());
+        cache.put(generateNewId(), TimeUtil.getServerSideTimeMillis());
 
         Minecraft minecraft = Minecraft.getInstance();
 

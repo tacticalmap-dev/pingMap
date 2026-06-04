@@ -8,6 +8,7 @@ import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.pingmanager.ping.EntityPing;
 import fun.bm.pingmap.pingmanager.ping.PointPing;
 import fun.bm.pingmap.pingmanager.ping.ServerPing;
+import fun.bm.pingmap.util.TimeUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -121,7 +122,7 @@ public class ServerPingManager implements PingManager {
     }
 
     public synchronized long generateUniqueTimestamp() {
-        long current = System.currentTimeMillis();
+        long current = TimeUtil.getServerSideTimeMillis();
         if (current <= lastTimestamp) {
             current = lastTimestamp + 1;
         }

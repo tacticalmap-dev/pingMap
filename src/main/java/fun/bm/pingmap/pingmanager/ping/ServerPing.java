@@ -3,6 +3,7 @@ package fun.bm.pingmap.pingmanager.ping;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
+import fun.bm.pingmap.util.TimeUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 
@@ -18,7 +19,7 @@ public class ServerPing extends BasePing {
     private boolean showDistance;
 
     public ServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance) {
-        this(name, dimension, x, y, z, color, showDistance, System.currentTimeMillis(), CommonConfig.getPingLifetimeSeconds(PingType.Server));
+        this(name, dimension, x, y, z, color, showDistance, TimeUtil.getServerSideTimeMillis(), CommonConfig.getPingLifetimeSeconds(PingType.Server));
     }
 
     public ServerPing(String name, String dimension, double x, double y, double z, int color, boolean showDistance, long timestamp, int expireAfter) {
@@ -56,7 +57,7 @@ public class ServerPing extends BasePing {
     }
 
     public Ping fromNBT(CompoundTag tag) {
-        long readTimestamp = tag.contains("timestamp") ? tag.getLong("timestamp") : System.currentTimeMillis();
+        long readTimestamp = tag.contains("timestamp") ? tag.getLong("timestamp") : TimeUtil.getServerSideTimeMillis();
         int readExpireAfter = tag.contains("expireAfter")
                 ? tag.getInt("expireAfter")
                 : CommonConfig.getPingLifetimeSeconds(PingType.Server);

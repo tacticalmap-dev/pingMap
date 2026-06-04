@@ -2,6 +2,7 @@ package fun.bm.pingmap.pingmanager.ping;
 
 import fun.bm.pingmap.config.local.CommonConfig;
 import fun.bm.pingmap.enums.PingType;
+import fun.bm.pingmap.util.TimeUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
@@ -68,7 +69,7 @@ public class EntityPing extends BasePing {
     }
 
     private Entity getEntity() {
-        long currentTime = System.currentTimeMillis();
+        long currentTime = TimeUtil.getServerSideTimeMillis();
         if (cachedEntity == null || currentTime - lastCheckTime > 1000) {
             Minecraft minecraft = Minecraft.getInstance();
             if (minecraft.level != null && entityId != null) {

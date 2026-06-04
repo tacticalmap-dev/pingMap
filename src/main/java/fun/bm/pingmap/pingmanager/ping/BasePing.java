@@ -1,6 +1,7 @@
 package fun.bm.pingmap.pingmanager.ping;
 
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
+import fun.bm.pingmap.util.TimeUtil;
 import net.minecraft.nbt.CompoundTag;
 
 public abstract class BasePing implements Ping {
@@ -42,6 +43,6 @@ public abstract class BasePing implements Ping {
         if (this.expireAfter < 0) {
             return false;
         }
-        return System.currentTimeMillis() - timestamp > expireAfter * 1000L;
+        return TimeUtil.getServerSideTimeMillis() - timestamp > expireAfter * 1000L;
     }
 }
