@@ -1,7 +1,5 @@
 package fun.bm.pingmap.pingmanager;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import fun.bm.pingmap.api.pingmanager.PingManager;
 import fun.bm.pingmap.api.pingmanager.ping.Ping;
 import fun.bm.pingmap.config.local.CommonConfig;
@@ -19,11 +17,12 @@ import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerPingManager implements PingManager {
     protected static ServerPingManager instance;
     protected long lastTimestamp = 0;
-    protected final Cache<Long, Ping> pings = CacheBuilder.newBuilder().build();
+    protected final Map<Long, Ping> pings = new ConcurrentHashMap<>();
 
     public static synchronized ServerPingManager get(MinecraftServer server) {
         if (instance == null) {
@@ -143,7 +142,7 @@ public class ServerPingManager implements PingManager {
             }
             for (Ping ping : getPings()) {
                 if (ping.expired() || count >= type.getMaxPings() && Objects.equals(ping.getDimension(), dimension) && Objects.equals(ping.getGeneratorId(), generatorId) && ping.getType() == type) {
-                    pings.invalidate(ping.getTimestamp());
+                    pings.remove(ping.getTimestamp());
                     count--;
                 }
             }
@@ -152,7 +151,7 @@ public class ServerPingManager implements PingManager {
 
     public void cancelPing(Ping ping) {
         MinecraftServer server = getServer();
-        pings.invalidate(ping.getTimestamp());
+        pings.remove(ping.getTimestamp());
         if (server != null) {
             save(server);
         }
@@ -160,14 +159,14 @@ public class ServerPingManager implements PingManager {
 
     public void cancelPing(long timestamp) {
         MinecraftServer server = getServer();
-        pings.invalidate(timestamp);
+        pings.remove(timestamp);
         if (server != null) {
             save(server);
         }
     }
 
     public Collection<Ping> getPings() {
-        return pings.asMap().values();
+        return pings.values();
     }
 
     public List<Ping> getPingsForDimension(String dimension) {
@@ -178,7 +177,7 @@ public class ServerPingManager implements PingManager {
         List<Ping> result = new ArrayList<>();
         for (Ping ping : getPings()) {
             if (checkExpired && ping.expired()) {
-                pings.invalidate(ping.getTimestamp());
+                pings.remove(ping.getTimestamp());
                 continue;
             }
             if (ping.getDimension().equals(dimension)) {

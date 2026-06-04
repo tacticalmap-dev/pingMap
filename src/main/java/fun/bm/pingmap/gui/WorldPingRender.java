@@ -49,23 +49,12 @@ public class WorldPingRender {
         }
 
         PoseStack poseStack = event.getPoseStack();
-        poseStack.pushPose();
 
         double cameraX = event.getCamera().getPosition().x();
         double cameraY = event.getCamera().getPosition().y();
         double cameraZ = event.getCamera().getPosition().z();
 
-        poseStack.translate(-cameraX, -cameraY, -cameraZ);
-
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-        RenderSystem.disableCull();
-
-        poseStack.popPose();
-
-        renderPings(event.getPoseStack(), minecraft, pings, cameraX, cameraY, cameraZ);
+        renderPings(poseStack, minecraft, pings, cameraX, cameraY, cameraZ);
     }
 
     private static void renderPings(PoseStack eventPoseStack, Minecraft minecraft, List<Ping> pings,
@@ -84,7 +73,7 @@ public class WorldPingRender {
 
         for (Ping ping : pings) {
             if (ping instanceof EntityPing entityPing) {
-                if (entityPing.getEntityId().equals(player.getUUID())) return;
+                if (entityPing.getEntityId().equals(player.getUUID())) continue;
             }
             double dx = ping.getX() - player.getX();
             double dy = ping.getY() - player.getY();
@@ -140,7 +129,6 @@ public class WorldPingRender {
                 bufferbuilder.vertex(matrix4f, s, -s, 0).uv(1.0F, 0.0F).endVertex();
                 tesselator.end();
 
-                // Reset shader color for text rendering that follows
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             } else if (icon instanceof String iconS) {
                 minecraft.font.drawInBatch(

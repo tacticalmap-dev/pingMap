@@ -14,9 +14,7 @@ import org.slf4j.Logger;
 
 @Mod(Pingmap.MODID)
 public class Pingmap {
-
     public static final String MODID = "pingmap";
-
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public Pingmap(FMLJavaModLoadingContext context) {
