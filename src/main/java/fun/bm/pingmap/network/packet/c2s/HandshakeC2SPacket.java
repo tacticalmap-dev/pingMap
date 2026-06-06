@@ -7,6 +7,7 @@ import fun.bm.pingmap.enums.PingType;
 import fun.bm.pingmap.network.MainNetworkHandler;
 import fun.bm.pingmap.network.packet.s2c.SyncConfigS2CPacket;
 import fun.bm.pingmap.network.packet.s2c.SyncMultiPingsS2CPacket;
+import fun.bm.pingmap.network.packet.s2c.SyncTimestampS2CPacket;
 import fun.bm.pingmap.pingmanager.ServerPingManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -83,6 +84,8 @@ public class HandshakeC2SPacket {
                         CommonConfig.getPingLifetimeSeconds(PingType.Friendly)
                 );
                 MainNetworkHandler.sendToPlayer(configPacket, player);
+
+                MainNetworkHandler.sendToPlayer(new SyncTimestampS2CPacket(), player);
             }
         });
         context.setPacketHandled(true);

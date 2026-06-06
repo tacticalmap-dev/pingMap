@@ -14,7 +14,7 @@ public class ClientLatencyHelper {
             return 0;
         }
 
-        long currentTime = TimeUtil.getClientSideTimeMillis();
+        long currentTime = TimeUtil.getLocalTimeMillis();
 
         if (currentTime - lastUpdateTime < CACHE_DURATION) {
             return cachedLatency;

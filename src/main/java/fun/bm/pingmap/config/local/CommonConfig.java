@@ -39,6 +39,10 @@ public final class CommonConfig {
             .comment("Send all pings to none team. (use vanilla's team)")
             .define("ping.sendAllPingsToNoneTeam", true);
 
+    public static final ForgeConfigSpec.IntValue RESYNC_SERVER_TIMESTAMP_INTERVAL = BUILDER
+            .comment("Resync server timestamp interval in ticks.")
+            .defineInRange("resyncServerTimestampInterval", 1200, 20, Integer.MAX_VALUE);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean hasServerConfig() {

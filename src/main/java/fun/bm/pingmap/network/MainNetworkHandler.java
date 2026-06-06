@@ -5,6 +5,7 @@ import fun.bm.pingmap.network.packet.c2s.PingC2SPacket;
 import fun.bm.pingmap.network.packet.s2c.SyncConfigS2CPacket;
 import fun.bm.pingmap.network.packet.s2c.SyncMultiPingsS2CPacket;
 import fun.bm.pingmap.network.packet.s2c.SyncSinglePingS2CPacket;
+import fun.bm.pingmap.network.packet.s2c.SyncTimestampS2CPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
@@ -12,7 +13,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class MainNetworkHandler {
-    public static final String MAIN_PROTOCOL_VERSION = "260604_192505"; // TODO - use commit sha to instead
+    public static final String MAIN_PROTOCOL_VERSION = "260606_170355"; // TODO - use commit sha to instead
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(Pingmap.MODID, "main"),
             () -> MAIN_PROTOCOL_VERSION,
@@ -55,6 +56,13 @@ public class MainNetworkHandler {
                 SyncConfigS2CPacket::handle
         );
 
+        INSTANCE.registerMessage(
+                packetId++,
+                SyncTimestampS2CPacket.class,
+                SyncTimestampS2CPacket::encode,
+                SyncTimestampS2CPacket::decode,
+                SyncTimestampS2CPacket::handle
+        );
     }
 
     public static void sendToServer(Object packet) {
